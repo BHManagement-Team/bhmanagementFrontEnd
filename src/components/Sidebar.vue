@@ -33,25 +33,25 @@
           <v-list-item-icon>
             <v-icon>mdi-blur-linear</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Room Management</v-list-item-title>
+          <v-list-item-title  @click="goto('/toDashboard')">Room Management</v-list-item-title>
         </v-list-item>
-        <v-list-item link>
+        <v-list-item link >
           <v-list-item-icon>
             <v-icon>mdi-account-multiple</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Occupant Management</v-list-item-title>
+          <v-list-item-title @click="goto('/toOccupantManagement')">Occupant Management</v-list-item-title>
         </v-list-item>
-        <v-list-item link>
+        <v-list-item link >
           <v-list-item-icon>
             <v-icon>mdi-settings</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Settings</v-list-item-title>
+          <v-list-item-title @click="goto('toSettings')">Settings</v-list-item-title>
         </v-list-item>
-        <v-list-item link>
+        <v-list-item link >
           <v-list-item-icon>
             <v-icon>mdi-exit-to-app</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>LogOut</v-list-item-title>
+          <v-list-item-title @click="goto('/')">LogOut</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -59,6 +59,11 @@
 </template>
 <script>
 export default {
-    name: 'Sidebar'
+    name: 'Sidebar',
+    methods:{
+      goto(link){
+        this.$router.push({path:link});
+      }
+    }
 }
 </script>

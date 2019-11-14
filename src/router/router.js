@@ -2,11 +2,12 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Dashboard from '../views/Dashboard.vue'
 import Login from '../views/Login.vue'
+import Setting from '../views/Setting.vue'
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/toDashboard',
+    path: '/toDashboard', 
     name: 'toDashboard',
     component: Dashboard
   },
@@ -14,6 +15,11 @@ const routes = [
     path: '/',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/toSettings',
+    name: 'Setting',
+    component: Setting
   }
 ]
 
