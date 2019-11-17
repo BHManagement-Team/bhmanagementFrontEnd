@@ -1,68 +1,32 @@
 <template>
-  <v-row>
-    <v-col cols="12" sm="6" offset-sm="3">
-      <v-container fluid>
-        <v-card class="elevation-12">
-          <v-toolbar color="primary" dark flat>
-            <v-toolbar-title>Username</v-toolbar-title>
-          </v-toolbar>
-          <form id="usernameForm">
-            <v-text-field
-              v-model="username"
-              :error-messages="nameErrors"
-              :counter="10"
-              label="Name"
-              required
-            ></v-text-field>
-
-            <v-btn class="mr-4">Save username</v-btn>
-          </form>
+  <v-card color="basil " id="tabs">
+    <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
+      <v-tab v-for="item in items" :key="item">{{ item }}</v-tab>
+    </v-tabs>
+    <v-tabs-items v-model="tab">
+      <v-tab-item v-for="item in items" :key="item">
+        <v-card flat>
+          <v-card-text>{{text}}</v-card-text>
         </v-card>
-      </v-container>
-      <v-container fluid>
-        <v-card class="elevation-12">
-          <v-toolbar color="primary" dark flat>
-            <v-toolbar-title>Password</v-toolbar-title>
-          </v-toolbar>
-          <form id="passwordForm">
-            <v-text-field
-              v-model="  currentPassword"
-              :error-messages="nameErrors"
-              :counter="10"
-              label="Current Password"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="  currentPassword"
-              :error-messages="nameErrors"
-              :counter="10"
-              label="Name"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="  currentPassword"
-              :error-messages="nameErrors"
-              :counter="10"
-              label="Name"
-              required
-            ></v-text-field>
-
-            <v-btn class="mr-4">Save username</v-btn>
-          </form>
-        </v-card>
-      </v-container>
-    </v-col>
-  </v-row>
+      </v-tab-item>
+    </v-tabs-items>
+  </v-card>
 </template>
 <style>
-#img {
-  width: 100px;
-  height: auto;
-}
-#usernameForm {
-  padding: 20px;
-}
-#passwordForm {
-  padding: 20px;
+#tabs {
+  margin-top: 110px !important;
+  margin-right: 200px !important;
+  margin-left: 200px !important;
 }
 </style>
+<script>
+export default {
+  data() {
+    return {
+      tab: null,
+      items: ["Profile", "Password"],
+      text:"Change something here...",
+    };
+  }
+};
+</script>

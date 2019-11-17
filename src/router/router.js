@@ -3,6 +3,8 @@ import VueRouter from 'vue-router'
 import Dashboard from '../views/Dashboard.vue'
 import Login from '../views/Login.vue'
 import Setting from '../views/Setting.vue'
+import Occupant from '../views/OccupantManagement.vue'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -20,6 +22,11 @@ const routes = [
     path: '/toSettings',
     name: 'Setting',
     component: Setting
+  },
+  {
+    path: '/toOccupantManagement',
+    name: 'Occupant',
+    component: Occupant
   }
 ]
 

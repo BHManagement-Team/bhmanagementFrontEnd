@@ -39,8 +39,8 @@
 
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                    <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+                    <v-btn class="ma-2" outlined color="error"  @click="save">Cancel</v-btn>
+                    <v-btn class="ma-2" outlined color="success"  @click="save">Save</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
@@ -60,13 +60,8 @@
   </div>
 </template>
 <style>
-#btnAddRoom {
-  position: absolute;
-  top: 130px;
-  left: 200px;
-}
 #table {
-  margin-top: 200px;
+  margin-top: 100px;
   margin-left: 250px;
   margin-right: 100px;
 }
@@ -104,7 +99,7 @@ export default{
 
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      return this.editedIndex === -1 ? 'Add Room Details' : 'Update Existing Room Details'
     },
   },
 
