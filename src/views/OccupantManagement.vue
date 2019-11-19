@@ -26,11 +26,11 @@
 
                   <v-card-text>
                     <v-container>
-                      <v-text-field v-model="editedItem.roomFloor" label="Room Floor"></v-text-field>
-                      <v-text-field v-model="editedItem.roomName" label="Room Name"></v-text-field>
-                      <v-text-field v-model="editedItem.roomOccupant" label="Name"></v-text-field>
-                      <v-text-field v-model="editedItem.email" label="Email" :rules="emailRules"></v-text-field>
-                      <v-text-field v-model="editedItem.contact" label="Contact"></v-text-field>
+                      <v-text-field v-model="editedItem.roomFloor" label="Room Floor" prepend-icon="mdi-home-floor-l"></v-text-field>
+                      <v-text-field v-model="editedItem.roomName" label="Room Name" prepend-icon="mdi-home-edit"></v-text-field>
+                      <v-text-field v-model="editedItem.roomOccupant" label="Name" prepend-icon="mdi-account"> </v-text-field>
+                      <v-text-field v-model="editedItem.email" label="Email" :rules="emailRules" prepend-icon="mdi-email"></v-text-field>
+                      <v-text-field v-model="editedItem.contact" label="Contact" prepend-icon="mdi-cellphone-iphone"></v-text-field>
                     </v-container>
                   </v-card-text>
 
@@ -80,7 +80,7 @@ export default {
     desserts: [],
     editedIndex: -1,
     editedItem: {
-      roomFloor: 1,
+      roomFloor: "",
       roomName: "",
       roomOccupant: "",
       email: "",
@@ -94,7 +94,7 @@ export default {
       contact: ""
     },
     paymentItem: {
-      roomFloor: 0,
+      roomFloor: '',
       roomName: "",
       roomOccupant: "",
       email: "",
