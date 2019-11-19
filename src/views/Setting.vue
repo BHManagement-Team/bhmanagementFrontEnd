@@ -1,32 +1,62 @@
 <template>
-  <v-card color="basil " id="tabs">
-    <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
-      <v-tab v-for="item in items" :key="item">{{ item }}</v-tab>
-    </v-tabs>
-    <v-tabs-items v-model="tab">
-      <v-tab-item v-for="item in items" :key="item">
-        <v-card flat>
-          <v-card-text>{{text}}</v-card-text>
-        </v-card>
-      </v-tab-item>
-    </v-tabs-items>
-  </v-card>
+  <div id="margin">
+    <v-card>
+      <v-tabs horizontal>
+        <v-tab class="padding">
+          <v-icon left>mdi-account</v-icon>Profile Setting
+        </v-tab>
+        <v-tab-item>
+          <v-card flat>
+            <v-card-text class="space">
+              <v-form>
+                <v-toolbar-title>Username</v-toolbar-title>
+                <br />
+                <v-text-field
+                  label="New username"
+                  prepend-icon="mdi-account"
+                  outlined
+                  v-model="currentPassword"
+                ></v-text-field><v-toolbar-title>Password</v-toolbar-title>
+                <br />
+                <v-text-field
+                  label="Current password"
+                  prepend-icon="mdi-lock"
+                  outlined
+                  v-model="currentPassword"
+                ></v-text-field>
+                <v-text-field
+                  label="New password"
+                  prepend-icon="mdi-account-lock"
+                  outlined
+                  v-model="newPassword"
+                ></v-text-field>
+                <v-text-field
+                  label="Confirm password"
+                  prepend-icon="mdi-lock"
+                  outlined
+                  v-model="confirmPassword"
+                ></v-text-field>
+                <center>
+                  <v-btn class="ma-2" outlined color="success">Save Changes</v-btn>
+                </center>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+      </v-tabs>
+    </v-card>
+  </div>
 </template>
 <style>
-#tabs {
-  margin-top: 110px !important;
-  margin-right: 200px !important;
-  margin-left: 200px !important;
+#margin {
+  max-width: 900px;
+  margin-left: 500px;
+  margin-top: 100px;
+}
+.padding {
+  max-width: 500px!important;
+}
+.space {
+  padding: 25px;
 }
 </style>
-<script>
-export default {
-  data() {
-    return {
-      tab: null,
-      items: ["Profile", "Password"],
-      text:"Change something here...",
-    };
-  }
-};
-</script>
