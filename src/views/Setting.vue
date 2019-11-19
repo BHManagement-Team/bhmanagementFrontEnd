@@ -1,0 +1,62 @@
+<template>
+  <div id="margin">
+    <v-card>
+      <v-tabs horizontal>
+        <v-tab class="padding">
+          <v-icon left>mdi-account</v-icon>Profile Setting
+        </v-tab>
+        <v-tab-item>
+          <v-card flat>
+            <v-card-text class="space">
+              <v-form>
+                <v-toolbar-title>Username</v-toolbar-title>
+                <br />
+                <v-text-field
+                  label="New username"
+                  prepend-icon="mdi-account"
+                  outlined
+                  v-model="currentPassword"
+                ></v-text-field><v-toolbar-title>Password</v-toolbar-title>
+                <br />
+                <v-text-field
+                  label="Current password"
+                  prepend-icon="mdi-lock"
+                  outlined
+                  v-model="currentPassword"
+                ></v-text-field>
+                <v-text-field
+                  label="New password"
+                  prepend-icon="mdi-account-lock"
+                  outlined
+                  v-model="newPassword"
+                ></v-text-field>
+                <v-text-field
+                  label="Confirm password"
+                  prepend-icon="mdi-lock"
+                  outlined
+                  v-model="confirmPassword"
+                ></v-text-field>
+                <center>
+                  <v-btn class="ma-2" outlined color="success">Save Changes</v-btn>
+                </center>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
+      </v-tabs>
+    </v-card>
+  </div>
+</template>
+<style>
+#margin {
+  max-width: 900px;
+  margin-left: 500px;
+  margin-top: 100px;
+}
+.padding {
+  max-width: 500px!important;
+}
+.space {
+  padding: 25px;
+}
+</style>
