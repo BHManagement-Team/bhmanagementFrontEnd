@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Dashboard from '../views/Dashboard.vue'
+// import Dashboard from '@/views/Dashboard.vue'
 import Login from '../views/Login.vue'
 import Setting from '../views/Setting.vue'
 import Occupant from '../views/OccupantManagement.vue'
@@ -9,29 +9,31 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/toDashboard', 
-    name: 'toDashboard',
-    component: Dashboard
+    path: '/dashboard', 
+    name: 'Dashboard',
+    component: ()=> import("@/views/Dashboard.vue")
   },
   {
-    path: '/',
+    path: '/login',
     name: 'Login',
     component: Login
   },
   {
-    path: '/toSettings',
+    path: '/settings',
     name: 'Setting',
     component: Setting
   },
   {
-    path: '/toOccupantManagement',
+    path: '/occupantmanagement',
     name: 'Occupant',
     component: Occupant
   }
 ]
 
 const router = new VueRouter({
-  routes
+  routes ,
+  mode: "history",
+  base: process.env.BASE_URL,
 })
 
 export default router

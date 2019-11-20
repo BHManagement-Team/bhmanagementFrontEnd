@@ -6,18 +6,19 @@
           <v-icon left>mdi-account</v-icon>Profile Setting
         </v-tab>
         <v-tab-item>
-          <v-card flat>
+          <v-card>
             <v-card-text class="space">
-              <v-form>
+              <v-form class="size">
                 <v-toolbar-title>Username</v-toolbar-title>
-                <br />
+                <br>
                 <v-text-field
                   label="New username"
                   prepend-icon="mdi-account"
                   outlined
                   v-model="currentPassword"
-                ></v-text-field><v-toolbar-title>Password</v-toolbar-title>
-                <br />
+                ></v-text-field>
+                <v-toolbar-title>Password</v-toolbar-title>
+                <br>
                 <v-text-field
                   label="Current password"
                   prepend-icon="mdi-lock"
@@ -50,13 +51,16 @@
 <style>
 #margin {
   max-width: 900px;
-  margin-left: 500px;
+  margin-left: 200px;
   margin-top: 100px;
 }
 .padding {
-  max-width: 500px!important;
+  max-width: 600px !important;
+  font-size: 50px !important;
+  padding: 20px !important;
 }
 .space {
+  font-size:5px !important;
   padding: 25px;
 }
 </style>

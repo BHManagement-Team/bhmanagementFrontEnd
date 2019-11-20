@@ -1,5 +1,5 @@
 <template>
-  <div id="styleMargin">
+  <div>
     <v-row>
       <v-col>
         <v-data-table
@@ -7,7 +7,7 @@
           :items="desserts"
           sort-by="roomName"
           class="elevation-1"
-          id="table"
+          id="styleMargins"
         >
           <template v-slot:top>
             <v-toolbar flat color="white">
@@ -29,7 +29,7 @@
                       <v-text-field v-model="editedItem.roomFloor" label="Room Floor"></v-text-field>
                       <v-text-field v-model="editedItem.roomName" label="Room Name"></v-text-field>
                       <v-text-field v-model="editedItem.roomOccupant" label="Name"></v-text-field>
-                      <v-text-field v-model="editedItem.email" label="Email" :rules="emailRules"></v-text-field>
+                      <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
                       <v-text-field v-model="editedItem.contact" label="Contact"></v-text-field>
                     </v-container>
                   </v-card-text>
@@ -44,9 +44,9 @@
             </v-toolbar>
           </template>
           <template v-slot:item.action="{ item }">
-            <v-btn class="ma-2" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
-            <v-btn class="ma-2" outlined color="primary" @click="editItem(item)">PAYMENT DETAILS</v-btn>
-            <v-btn class="ma-2" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
+            <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
+            <v-btn class="text" outlined color="primary" @click="editItem(item)">PAYMENT DETAILS</v-btn>
+            <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
           <template v-slot:no-data>
             <v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -57,15 +57,20 @@
   </div>
 </template>
 <style>
-#styleMargin {
-  margin-left: 30px;
-  margin-right: 100px;
-  max-width: 1320px;
+#styleMargins {
+  margin-top: 100px !important;
+  margin-left: 200px !important;
+  max-width: 900px !important;
+}
+.text {
+  font-size: 10px !important;
+  margin-left: 10px;
 }
 </style>
 <script>
 export default {
   data: () => ({
+    table: false,
     dialog: false,
     headers: [
       {

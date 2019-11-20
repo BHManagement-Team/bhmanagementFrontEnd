@@ -1,6 +1,6 @@
 <template>
   <v-app>
-      <Sidebar v-if="LoginPage()"/>
+      <Sidebar v-if="$route.path !== '/login'"/>
       <v-content>
         <router-view/>
       </v-content>
@@ -15,13 +15,6 @@ export default {
     Sidebar
   },
   methods: {
-      LoginPage() {
-        if(this.$route.path == "/") {
-          return false
-        } else {
-          return true
-        }
-      }
     }
 };
 </script>

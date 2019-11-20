@@ -48,26 +48,28 @@
   </div>
 </template>
 <script>
+// import axios from "axios";
 export default {
-  name: "btnLogin",
-  data(){
-    return{
+  name: "Login",
+  data() {
+    return {
       username: "",
       password: ""
-    }
+    };
   },
   methods: {
     login() {
-      if(this.username == "admin" && this.password == "admin"){
-        this.$router.push({name: 'toDashboard'})
-      }else{
-        alert("Invalid credentials")
+      // axios
+      //   .get("http://localhost:3000/bhm/login",{username})
+      //   .then(response => (this.info = response));
+      if (this.username == "admin" && this.password == "admin") {
+        this.$router.push({ name: "Dashboard" });
+      } else {
+        alert("Invalid credentials");
       }
     }
   },
-  props:{
-    
-  }
+  props: {}
 };
 </script>
 <style>
