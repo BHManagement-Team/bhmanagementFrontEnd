@@ -1,6 +1,6 @@
 <template>
   <v-app>
-      <Sidebar v-if="$route.path !== '/login'"/>
+      <Sidebar v-if="$route.path !== '/'"/>
       <v-content>
         <router-view/>
       </v-content>

@@ -1,9 +1,8 @@
 <template>
     <v-navigation-drawer 
-    app
+      app
       expand-on-hover
-     
-      hide-overlay
+      hide-overlay 
     >
       <template v-slot:prepend>
         <v-list>
@@ -51,7 +50,7 @@
           <v-list-item-icon>
             <v-icon>mdi-exit-to-app</v-icon>
           </v-list-item-icon>
-          <v-list-item-title @click="goto('/login')">LogOut</v-list-item-title>
+          <v-list-item-title @click="goto('/')">LogOut</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>

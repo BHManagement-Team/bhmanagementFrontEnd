@@ -34,6 +34,7 @@
                   <v-spacer></v-spacer>
                   <!-- <router-link class="btnLogin" :to="'/toDashboard'"> -->
                   <v-btn v-on:click="login" color="primary">Login</v-btn>
+                  <!-- @click='login()' -->
                   <br>
                   <br>
                   <!-- </router-link> -->
