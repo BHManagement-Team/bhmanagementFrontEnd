@@ -62,6 +62,9 @@ export default {
     name: 'Sidebar',
     methods:{
       goto(link){
+        if(link == "/dashboard"){
+          console.log(link)
+        }
         this.$router.push({path:link});
       }
     }

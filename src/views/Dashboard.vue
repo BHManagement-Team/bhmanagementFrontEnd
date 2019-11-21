@@ -2,7 +2,13 @@
   <div>
     <v-row>
       <v-col>
-        <v-data-table :headers="headers" :items="desserts" sort-by="roomName" class="elevation-1" id="table">
+        <v-data-table
+          :headers="headers"
+          :items="desserts"
+          sort-by="roomName"
+          class="elevation-1"
+          id="table"
+        >
           <template v-slot:top>
             <v-toolbar flat color="white">
               <v-toolbar-title>Room Management</v-toolbar-title>
@@ -39,12 +45,11 @@
 
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn class="ma-2" outlined color="error"  @click="save">Cancel</v-btn>
-                    <v-btn class="ma-2" outlined color="success"  @click="save">Save</v-btn>
+                    <v-btn class="ma-2" outlined color="error" @click="save">Cancel</v-btn>
+                    <v-btn class="ma-2" outlined color="success" @click="save">Save</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
-
             </v-toolbar>
           </template>
           <template v-slot:item.action="{ item }">
@@ -52,7 +57,7 @@
             <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
           </template>
           <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+            <v-btn color="primary" >Reset</v-btn>
           </template>
         </v-data-table>
       </v-col>
@@ -67,102 +72,122 @@
 }
 </style>
 <script>
-export default{
+import axios from "axios";
+function populateRoom(){
+      var desserts=[]
+      axios
+      .post("http://localhost:3000/bhm/retrieveAllRooms",{token:"sd"})
+      .then(response => {
+        console.log(response)
+        var datax = response.data.data;
+        var counter = 0;
+        for (counter; counter < datax.length; counter++) {
+          desserts.push({
+            roomFloor: datax[counter].room_floor,
+            roomName: datax[counter].room_name,
+            roomCapacity: datax[counter].room_capacity,
+            rentPrice: datax[counter].room_price
+          });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+      return desserts
+    }
+export default {
   data: () => ({
     dialog: false,
     headers: [
       {
-        text: 'Room Floor',
-        align: 'left',
-        value: 'roomFloor',
+        text: "Room Floor",
+        align: "left",
+        value: "roomFloor"
       },
-      { text: 'Room Name', value: 'roomName' ,sortable: false },
-      { text: 'Room Capacity', value: 'roomCapacity',sortable: false },
-      { text: 'Rent Price', value: 'rentPrice' },
-      { text: 'Actions', value: 'action', sortable: false },
+      { text: "Room Name", value: "roomName", sortable: false },
+      { text: "Room Capacity", value: "roomCapacity", sortable: false },
+      { text: "Rent Price", value: "rentPrice" },
+      { text: "Actions", value: "action", sortable: false }
     ],
     desserts: [],
     editedIndex: -1,
     editedItem: {
       roomFloor: 1,
-      roomName: '',
+      roomName: "",
       roomCapacity: 0,
       rentPrice: 0
-    },
-    defaultItem: {
-      roomFloor: 0,
-      roomName: '',
-      roomCapacity: 0,
-      rentPrice: 0
-    },
+    }
   }),
 
   computed: {
-    formTitle () {
-      return this.editedIndex === -1 ? 'Add Room Details' : 'Update Existing Room Details'
-    },
+    formTitle() {
+      return this.editedIndex === -1
+        ? "Add Room Details"
+        : "Update Existing Room Details";
+    }
   },
-
+  created() {
+    
+    this.desserts=populateRoom()
+  },
   watch: {
-    dialog (val) {
-      val || this.close()
-    },
-  },
-
-  created () {
-    this.initialize()
+    dialog(val) {
+      val || this.close();
+    }
   },
   methods: {
-    initialize () {
-      this.desserts = [
-        {
-          roomFloor: 2,
-          roomName: '2CFloor',
-          roomCapacity: 10,
-          rentPrice: 5000
-        },
-        {
-          roomFloor: 1,
-          roomName: '1AFloor',
-          roomCapacity: 5,
-          rentPrice: 1000
-        },
-        {
-          roomFloor: 1,
-          roomName: '1BFloor',
-          roomCapacity: 5,
-          rentPrice: 1000
-        }
-      ]
+    
+      editItem(item) {
+      this.editedIndex = this.desserts.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialog = true;
+    },
+    deleteItem(item) {
+      const index = this.desserts.indexOf(item);
+      confirm("Are you sure you want to delete this item?") &&
+        this.desserts.splice(index, 1);
     },
 
-    editItem (item) {
-      this.editedIndex = this.desserts.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
-    },
-
-    deleteItem (item) {
-      const index = this.desserts.indexOf(item)
-      confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
-    },
-
-    close () {
-      this.dialog = false
+    close() {
+      this.dialog = false;
       setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      }, 300)
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      }, 300);
     },
 
-    save () {
+    save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        axios
+          .post("http:/localhost:3000/bhm/updateRoom?method=boolean", {room_name: this.editedItem.roomName,
+            room_floor: this.editedItem.roomFloor,
+            room_capacity: this.editedItem.roomCapacity,
+            room_price: this.editedItem.rentPrice})
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
       } else {
-        this.desserts.push(this.editedItem)
+        this.desserts.push(this.editedItem);
+        axios
+          .post("http://localhost:3000/bhm/createRoom", {
+            room_name: this.editedItem.roomName,
+            room_floor: this.editedItem.roomFloor,
+            room_capacity: this.editedItem.roomCapacity,
+            room_price: this.editedItem.rentPrice
+          })
+          .then( 
+            this.desserts=populateRoom()
+          )
+          .catch(error => {
+            console.log(error);
+          });
       }
-      this.close()
-    },
-  },
-}
+      this.close();
+    }
+  }
+};
 </script>

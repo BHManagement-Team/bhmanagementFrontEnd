@@ -48,7 +48,7 @@
   </div>
 </template>
 <script>
-// import axios from "axios";
+ 
 export default {
   name: "Login",
   data() {
@@ -63,7 +63,9 @@ export default {
       //   .get("http://localhost:3000/bhm/login",{username})
       //   .then(response => (this.info = response));
       if (this.username == "admin" && this.password == "admin") {
+        
         this.$router.push({ name: "Dashboard" });
+        
       } else {
         alert("Invalid credentials");
       }
