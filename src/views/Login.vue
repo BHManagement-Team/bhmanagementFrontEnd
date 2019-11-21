@@ -49,8 +49,9 @@
   </div>
 </template>
 <script>
- 
+import axios from 'axios';
 export default {
+
   name: "Login",
   data() {
     return {
@@ -60,13 +61,15 @@ export default {
   },
   methods: {
     login() {
-      // axios
-      //   .get("http://localhost:3000/bhm/login",{username})
-      //   .then(response => (this.info = response));
+      axios
+        .post("http://localhost:3000/bhm/login", { username: this.username, password: this.password })
+        .then(response => {
+          // this.info = response;
+          alert("Successfully connected to backend!\nSEE CONSOLE LOGS!");
+          console.log(response.data)
+        });
       if (this.username == "admin" && this.password == "admin") {
-        
         this.$router.push({ name: "Dashboard" });
-        
       } else {
         alert("Invalid credentials");
       }

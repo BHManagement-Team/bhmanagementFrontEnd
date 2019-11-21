@@ -20,32 +20,61 @@
                   <v-btn color="primary" dark class="mb-2" v-on="on">Add Occupant</v-btn>
                 </template>
                 <v-card>
-                  <v-card-title>
-                    <span class="headline">{{ formTitle }}</span>
-                  </v-card-title>
+                  <v-form ref="form" v-model="valid" lazy-validation>
+                    <v-card-title>
+                      <span class="headline">{{ formTitle }}</span>
+                    </v-card-title>
 
-                  <v-card-text>
-                    <v-container>
-                      <v-text-field v-model="editedItem.roomFloor" label="Room Floor"></v-text-field>
-                      <v-text-field v-model="editedItem.roomName" label="Room Name"></v-text-field>
-                      <v-text-field v-model="editedItem.roomOccupant" label="Name"></v-text-field>
-                      <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
-                      <v-text-field v-model="editedItem.contact" label="Contact"></v-text-field>
-                    </v-container>
-                  </v-card-text>
+                    <v-card-text>
+                      <v-container>
+                        <v-text-field
+                          v-model="editedItem.roomFloor"
+                          label="Room Floor"
+                          :rules="nameRules"
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="editedItem.roomName"
+                          label="Room Name"
+                          :rules="nameRules"
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="editedItem.roomOccupant"
+                          label="Name"
+                          :rules="nameRules"
+                        ></v-text-field>
+                        <v-text-field v-model="editedItem.email" label="Email" :rules="emailRules"></v-text-field>
+                        <v-text-field
+                          v-model="editedItem.contact"
+                          label="Contact"
+                          :rules="nameRules"
+                        ></v-text-field>
+                      </v-container>
+                    </v-card-text>
 
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
-                    <v-btn class="ma-2" outlined color="success" @click="save()">Save</v-btn>
-                  </v-card-actions>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
+                      <v-btn
+                        class="ma-2"
+                        outlined
+                        color="success"
+                        @click="save()"
+                        :disabled="!valid"
+                      >Save</v-btn>
+                    </v-card-actions>
+                  </v-form>
                 </v-card>
               </v-dialog>
             </v-toolbar>
           </template>
           <template v-slot:item.action="{ item }">
             <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
-            <v-btn class="text" outlined color="primary" @click="payment = true,editedPayment(item)">PAYMENT DETAILS</v-btn>
+            <v-btn
+              class="text"
+              outlined
+              color="primary"
+              @click="payment = true,editedPayment(item)"
+            >PAYMENT DETAILS</v-btn>
             <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
           <template v-slot:no-data>
@@ -126,6 +155,14 @@
 <script>
 export default {
   data: () => ({
+    valid: true,
+    name: "",
+    nameRules: [v => !!v || "Name is required"],
+    email: "",
+    emailRules: [
+      v => !!v || "E-mail is required",
+      v => /.+@.+\..+/.test(v) || "E-mail must be valid"
+    ],
     modalPayment: false,
     payment: false,
     dialog: false,
@@ -142,7 +179,7 @@ export default {
     editedIndex: -1,
     editedPayment: {
       paymentDate: 0,
-      paymentAmount:0
+      paymentAmount: 0
     },
     defaultPayment: {
       paymentDate: 0,
@@ -162,14 +199,14 @@ export default {
     desserts: [],
     editedIndex: -1,
     editedItem: {
-      roomFloor: 1,
+      roomFloor: "",
       roomName: "",
       roomOccupant: "",
       email: "",
       contact: ""
     },
     defaultItem: {
-      roomFloor: 0,
+      roomFloor: "",
       roomName: "",
       roomOccupant: "",
       email: "",
@@ -204,7 +241,7 @@ export default {
           roomOccupant: "Chilla Jean",
           email: "c@gmail.com",
           contact: "094452492469",
-          paymentDate:[ "January 11,2019"],
+          paymentDate: ["January 11,2019"],
           paymentAmount: [500]
         },
         {
@@ -228,7 +265,7 @@ export default {
       ];
     },
     editPayment(item) {
-      this.editedIndex = this.desserts.indexOf(item)
+      this.editedIndex = this.desserts.indexOf(item);
       this.editedPayment = Object.assign({}, item);
       this.dialog = true;
     },
@@ -248,20 +285,34 @@ export default {
       this.modalPayment = false;
     },
     close() {
-      this.dialog = false;
+      this.$refs.form.resetValidation();
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       }, 300);
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-      } else {
-        this.desserts.push(this.editedItem);
+      for (let key in this.editedItem) {
+        if (this.editedItem.hasOwnProperty(key)) {
+          this.editedItem[key] = "";
+        }
       }
-      this.close();
+      this.dialog = false;
+    },
+    save() {
+      if (this.$refs.form.validate()) {
+        this.snackbar = true;
+        if (this.editedIndex > -1) {
+          Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        } else {
+          this.desserts.push(this.editedItem);
+        }
+        for (let key in this.editedItem) {
+          if (this.editedItem.hasOwnProperty(key)) {
+            this.editedItem[key] = "";
+          }
+        }
+        this.$refs.form.resetValidation();
+        this.close();
+      }
     }
   }
 };
