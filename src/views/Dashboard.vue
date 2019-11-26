@@ -76,9 +76,9 @@ import axios from "axios";
 function populateRoom(){
       var desserts=[]
       axios
-      .post("http://localhost:3000/bhm/retrieveAllRooms",{token:"sd"})
+      .post("http://localhost:3000/bhm/retrieveAllRooms",{token:"null"})
       .then(response => {
-        console.log("going dashboard "+localStorage.token)
+       
         console.log(response)
         var datax = response.data.data;
         var counter = 0;
