@@ -196,7 +196,6 @@ export default {
       { text: "Occupant", value: "roomOccupant", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
-    desserts: [],
     editedIndex: -1,
     editedItem: {
       roomFloor: "",
@@ -300,6 +299,11 @@ export default {
     save() {
       if (this.$refs.form.validate()) {
         this.snackbar = true;
+        this.axios
+        .post('http://localhost:3000/bhm/createOccupant')
+        .then(response =>{
+          this.desserts.push(response.data.data)
+        })
         if (this.editedIndex > -1) {
           Object.assign(this.desserts[this.editedIndex], this.editedItem);
         } else {

@@ -177,7 +177,8 @@ export default {
             room_name: this.editedItem.roomName,
             room_floor: this.editedItem.roomFloor,
             room_capacity: this.editedItem.roomCapacity,
-            room_price: this.editedItem.rentPrice
+            room_price: this.editedItem.rentPrice,
+            token :'fdsfdsf'
           })
           .then( 
             this.desserts=populateRoom()
