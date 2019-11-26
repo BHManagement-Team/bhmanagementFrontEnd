@@ -78,6 +78,7 @@ function populateRoom(){
       axios
       .post("http://localhost:3000/bhm/retrieveAllRooms",{token:"sd"})
       .then(response => {
+        console.log("going dashboard "+localStorage.token)
         console.log(response)
         var datax = response.data.data;
         var counter = 0;
@@ -166,6 +167,7 @@ export default {
             room_price: this.editedItem.rentPrice})
           .then(response => {
             console.log(response);
+            
           })
           .catch(error => {
             console.log(error);
@@ -181,6 +183,7 @@ export default {
             token :'fdsfdsf'
           })
           .then( 
+            
             this.desserts=populateRoom()
           )
           .catch(error => {
