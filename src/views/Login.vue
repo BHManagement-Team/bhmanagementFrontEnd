@@ -10,7 +10,7 @@
                 <v-card-text>
                   <v-form>
                     <center>
-                      <img src="~@/assets/bhmLogo.png">
+                      <img src="~@/assets/bhmLogo.png" />
                       <h3>BHManagement System</h3>
                     </center>
                     <v-text-field
@@ -35,8 +35,8 @@
                   <!-- <router-link class="btnLogin" :to="'/toDashboard'"> -->
                   <v-btn v-on:click="login" color="primary">Login</v-btn>
                   <!-- @click='login()' -->
-                  <br>
-                  <br>
+                  <br />
+                  <br />
                   <!-- </router-link> -->
                   <v-spacer></v-spacer>
                 </v-card-actions>
@@ -49,9 +49,8 @@
   </div>
 </template>
 <script>
-import axios from 'axios';
+import axios from "axios";
 export default {
-
   name: "Login",
   data() {
     return {
@@ -62,17 +61,22 @@ export default {
   methods: {
     login() {
       axios
-        .post("http://localhost:3000/bhm/login", { username: this.username, password: this.password })
+        .post("http://localhost:3000/bhm/login", {
+          username: this.username,
+          password: this.password
+        })
         .then(response => {
-          // this.info = response;
-          alert("Successfully connected to backend!\nSEE CONSOLE LOGS!");
-          console.log(response.data)
+          console.log(response.data);
+          if (this.username == "admin" && this.password == "admin") {
+            this.$router.push({ name: "Dashboard" });
+          } else {
+            alert("Invalid credentials");
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+          alert("Invalid credentails");
         });
-      if (this.username == "admin" && this.password == "admin") {
-        this.$router.push({ name: "Dashboard" });
-      } else {
-        alert("Invalid credentials");
-      }
     }
   },
   props: {}
