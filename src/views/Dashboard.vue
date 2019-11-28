@@ -84,6 +84,7 @@ function populateRoom(){
         var counter = 0;
         for (counter; counter < datax.length; counter++) {
           desserts.push({
+            number:datax[counter]._id,
             roomFloor: datax[counter].room_floor,
             roomName: datax[counter].room_name,
             roomCapacity: datax[counter].room_capacity,
@@ -113,6 +114,7 @@ export default {
     desserts: [],
     editedIndex: -1,
     editedItem: {
+      number:"",
       roomFloor: 1,
       roomName: "",
       roomCapacity: 0,
@@ -165,8 +167,9 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        alert("number is "+this.editedItem.number)
         axios
-          .post("http:/localhost:3000/bhm/updateRoom?method=boolean", {room_name: this.editedItem.roomName,
+          .post("http://localhost:3000/bhm/updateRoom", {id:this.editedItem.number,room_name: this.editedItem.roomName,
             room_floor: this.editedItem.roomFloor,
             room_capacity: this.editedItem.roomCapacity,
             room_price: this.editedItem.rentPrice})
