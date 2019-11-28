@@ -16,10 +16,16 @@
               <v-spacer></v-spacer>
               <v-dialog v-model="dialog" max-width="500px">
                 <template v-slot:activator="{ on }">
-                  <v-btn color="default" dark class="mb-2" v-on="on">New Item</v-btn>
+                  <v-btn
+                    color="default"
+                    dark
+                    class="mb-2"
+                    @click="update = false"
+                    v-on="on"
+                  >New Item</v-btn>
                 </template>
                 <v-card>
-                  <v-card-title>
+                    <v-card-title>
                     <span class="headline">{{ formTitle }}</span>
                   </v-card-title>
                   <v-card-text>
@@ -55,7 +61,7 @@
                   <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
-                    <v-btn class="ma-2" outlined color="success" @click="save()">Save</v-btn>
+                    <v-btn class="ma-2" outlined color="success" @click="save()" >Save</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
@@ -77,7 +83,7 @@
         </v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <br>
+          <br />
           <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
           <v-btn class="ma-2" outlined color="success" @click="deleteItem(currentId)">Yes</v-btn>
         </v-card-actions>
@@ -108,7 +114,7 @@ export default {
     ],
     room: [],
     editedIndex: -1,
-    editedItem: { roomFloor: 0, roomName: "", roomCapacity: 0, rentPrice: 0 }
+    editedItem: { roomFloor: "", roomName: "", roomCapacity: "", rentPrice: "" }
   }),
   computed: {
     formTitle() {
@@ -136,13 +142,14 @@ export default {
         });
     },
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedudpaIndex = this.room.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     openDialog(id) {
       (this.confirm = true), (this.currentId = id);
     },
+
     deleteItem(id) {
       const index = this.room.indexOf(id);
       axios
@@ -164,23 +171,8 @@ export default {
         this.editedIndex = -1;
       }, 300);
     },
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.room[this.editedIndex], this.editedItem);
-        axios
-          .post("http:/localhost:3000/bhm/updateRoom?method=boolean", {
-            room_name: this.editedItem.roomName,
-            room_floor: this.editedItem.roomFloor,
-            room_capacity: this.editedItem.roomCapacity,
-            room_price: this.editedItem.rentPrice
-          })
-          .then(response => {
-            console.log(response);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      } else {
+    save() {     
+      if (!update){
         axios
           .post("http://localhost:3000/bhm/createRoom", {
             token: "fdsfasdf",
@@ -190,19 +182,34 @@ export default {
             room_price: this.editedItem.rentPrice
           }) //
           .then(response => {
-            this.room.push(response.data);
-            (this.room = populateRoom()), (this.dialog = false);
-            console.log(response);
+            this.room.push(response.data.data);
+            this.dialog = false;
           })
           .catch(error => {
             console.log(error);
           });
       }
-      this.close();
-    },
-    mounted() {
-      this.populateRoom();
     }
+  },
+  mounted() {
+    this.room = this.populateRoom();
   }
 };
+      // if (!this.update) {
+      //   axios
+      //     .post("http://localhost:3000/bhm/createRoom", {
+      //       token: "fdsfasdf",
+      //       room_name: this.editedItem.roomName,
+      //       room_floor: this.editedItem.roomFloor,
+      //       room_capacity: this.editedItem.roomCapacity,
+      //       room_price: this.editedItem.rentPrice
+      //     }) //
+      //     .then(response => {
+      //       this.room.push(response.data.data);
+      //       this.dialog = false;
+      //     })
+      //     .catch(error => {
+      //       console.log(error);
+      //     });
+      // }
 </script>
