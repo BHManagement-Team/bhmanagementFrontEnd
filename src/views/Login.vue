@@ -50,6 +50,7 @@
 </template>
 <script>
 import axios from "axios";
+console.log(localStorage.token)
 export default {
   name: "Login",
   data() {

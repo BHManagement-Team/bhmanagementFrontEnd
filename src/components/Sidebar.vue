@@ -60,11 +60,11 @@
 export default {
     name: 'Sidebar',
     methods:{
-      goto(link){
-        if(link == "/dashboard"){
-          console.log(link)
-        }
+      goto(link){   
         this.$router.push({path:link});
+          if(link=='/'){
+            localStorage.token="null";
+          }
       }
     }
 }

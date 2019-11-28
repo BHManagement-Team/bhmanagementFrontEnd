@@ -76,7 +76,7 @@ import axios from "axios";
 function populateRoom(){
       var desserts=[]
       axios
-      .post("http://localhost:3000/bhm/retrieveAllRooms",{token:"null"})
+      .post("http://localhost:3000/bhm/retrieveAllRooms",{token:localStorage.token})
       .then(response => {
        
         console.log(response)
@@ -127,10 +127,15 @@ export default {
         : "Update Existing Room Details";
     }
   },
-  created() {
-    
-    this.desserts=populateRoom()
+  mounted() {
+    if(localStorage.token!="null"){
+      this.desserts=populateRoom()
+    }else{
+      this.$router.push({path:"/"});
+    }
   },
+  
+ 
   watch: {
     dialog(val) {
       val || this.close();
@@ -180,7 +185,7 @@ export default {
             room_floor: this.editedItem.roomFloor,
             room_capacity: this.editedItem.roomCapacity,
             room_price: this.editedItem.rentPrice,
-            token :'fdsfdsf'
+            token :localStorage.token
           })
           .then( 
             
