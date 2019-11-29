@@ -226,6 +226,17 @@ export default {
       val || this.close();
     }
   },
+<<<<<<< HEAD
+=======
+   created() {
+    if(localStorage.token!="null"){
+      this.initialize();
+    }else{
+      this.$router.push({path:"/"});
+    }
+  },
+  
+>>>>>>> balugo
   methods: {
     populateOccupant() {
       axios

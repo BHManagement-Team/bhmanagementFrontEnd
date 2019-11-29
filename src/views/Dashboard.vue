@@ -99,6 +99,33 @@
 </style>
 <script>
 import axios from "axios";
+<<<<<<< HEAD
+=======
+function populateRoom(){
+      var desserts=[]
+      axios
+      .post("http://localhost:3000/bhm/retrieveAllRooms",{token:localStorage.token})
+      .then(response => {
+       
+        console.log(response)
+        var datax = response.data.data;
+        var counter = 0;
+        for (counter; counter < datax.length; counter++) {
+          desserts.push({
+            number:datax[counter]._id,
+            roomFloor: datax[counter].room_floor,
+            roomName: datax[counter].room_name,
+            roomCapacity: datax[counter].room_capacity,
+            rentPrice: datax[counter].room_price
+          });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+      return desserts
+    }
+>>>>>>> balugo
 export default {
   data: () => ({
     confirm: false,
@@ -113,7 +140,17 @@ export default {
     ],
     room: [],
     editedIndex: -1,
+<<<<<<< HEAD
     editedItem: { roomFloor: "", roomName: "", roomCapacity: "", rentPrice: "" }
+=======
+    editedItem: {
+      number:"",
+      roomFloor: 1,
+      roomName: "",
+      roomCapacity: 0,
+      rentPrice: 0
+    }
+>>>>>>> balugo
   }),
   computed: {
     formTitle() {
@@ -122,6 +159,18 @@ export default {
         : "Update Existing Room Details";
     }
   },
+<<<<<<< HEAD
+=======
+  mounted() {
+    if(localStorage.token!="null"){
+      this.desserts=populateRoom()
+    }else{
+      this.$router.push({path:"/"});
+    }
+  },
+  
+ 
+>>>>>>> balugo
   watch: {
     dialog(val) {
       val || this.close();
@@ -171,19 +220,49 @@ export default {
       }, 300);
     },
     save() {
+<<<<<<< HEAD
       if (!this.update) {
+=======
+      if (this.editedIndex > -1) {
+        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        alert("number is "+this.editedItem.number)
+        axios
+          .post("http://localhost:3000/bhm/updateRoom", {id:this.editedItem.number,room_name: this.editedItem.roomName,
+            room_floor: this.editedItem.roomFloor,
+            room_capacity: this.editedItem.roomCapacity,
+            room_price: this.editedItem.rentPrice})
+          .then(response => {
+            console.log(response);
+            
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else {
+        this.desserts.push(this.editedItem);
+>>>>>>> balugo
         axios
           .post("http://localhost:3000/bhm/createRoom", {
             token: "fdsfasdf",
             room_name: this.editedItem.roomName,
             room_floor: this.editedItem.roomFloor,
             room_capacity: this.editedItem.roomCapacity,
+<<<<<<< HEAD
             room_price: this.editedItem.rentPrice
           }) //
           .then(response => {
             this.room.push(response.data.data);
             this.dialog = false;
           })
+=======
+            room_price: this.editedItem.rentPrice,
+            token :localStorage.token
+          })
+          .then( 
+            
+            this.desserts=populateRoom()
+          )
+>>>>>>> balugo
           .catch(error => {
             console.log(error);
           });
