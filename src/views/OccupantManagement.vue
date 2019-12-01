@@ -4,7 +4,7 @@
       <v-col>
         <v-data-table
           :headers="headers"
-          :items="desserts"
+          :items="occupant"
           sort-by="roomName"
           class="elevation-1"
           id="styleMargins"
@@ -77,15 +77,12 @@
             >PAYMENT DETAILS</v-btn>
             <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
-          <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
-          </template>
         </v-data-table>
         <!-- PAYMENT HISTORY -->
         <v-dialog v-model="payment" max-width="800px">
           <v-data-table
             :headers="paymentHeaders"
-            :items="desserts"
+            :items="payment"
             sort-by="roomName"
             class="elevation-1"
           >
@@ -153,9 +150,10 @@
 }
 </style>
 <script>
-// import axios from "axios";
+import axios from "axios";
 export default {
   data: () => ({
+    occupant: [],
     valid: true,
     name: "",
     nameRules: [v => !!v || "Name is required"],
@@ -228,58 +226,34 @@ export default {
       val || this.close();
     }
   },
-
-  created() {
-    this.initialize();
-  },
   methods: {
-    initialize() {
-      this.desserts = [
-        {
-          roomFloor: 2,
-          roomName: "2CFloor",
-          roomOccupant: "Chilla Jean",
-          email: "c@gmail.com",
-          contact: "094452492469",
-          paymentDate: ["January 11,2019"],
-          paymentAmount: [500]
-        },
-        {
-          roomFloor: 1,
-          roomName: "1AFloor",
-          roomOccupant: "Hannah Mae",
-          email: "c@gmail.com",
-          contact: "094452492469",
-          paymentDate: ["January 20,2019", "February 20,2019", "March 20,2019"],
-          paymentAmount: [1500, 1500, 1500]
-        },
-        {
-          roomFloor: 1,
-          roomName: "1BFloor",
-          roomOccupant: "Marion Jay",
-          email: "c@gmail.com",
-          contact: "094452492469",
-          paymentDate: ["January 10,2019", "March 20,2019"],
-          paymentAmount: [500, 1000]
-        }
-      ];
+    populateOccupant() {
+      axios
+        .post("http://localhost:3000/bhm/retrieveAllOccupants", { token: "sd" })
+        .then(response => {
+          console.log(response);
+          this.occupant = response.data.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
     editPayment(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.occupant.indexOf(item);
       this.editedPayment = Object.assign({}, item);
       this.dialog = true;
     },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.occupant.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      const index = this.desserts.indexOf(item);
+      const index = this.occupant.indexOf(item);
       confirm("Are you sure you want to delete this?") &&
-        this.desserts.splice(index, 1);
+        this.occupant.splice(index, 1);
     },
     closePaymentModal() {
       this.modalPayment = false;
@@ -300,15 +274,30 @@ export default {
     save() {
       if (this.$refs.form.validate()) {
         this.snackbar = true;
-        this.axios
-        .post('http://localhost:3000/bhm/createOccupant')
-        .then(response =>{
-          this.desserts.push(response.data.data)
-        })
+        axios
+          .post("http://localhost:3000/bhm/createOccupant", { token: "DSFSDF" })
+          .then(response => {
+            this.occupant.push(response.data.data);
+          });
         if (this.editedIndex > -1) {
           Object.assign(this.desserts[this.editedIndex], this.editedItem);
+          alert("number is " + this.editedItem.number);
+          axios
+            .post("http://localhost:3000/bhm/updateRoom", {
+              id: this.editedItem.number,
+              room_name: this.editedItem.roomName,
+              room_floor: this.editedItem.roomFloor,
+              occupant_name: this.editedItem.occupant_name,
+              occupant_email: this.editedItem.occupant_contact
+            })
+            .then(response => {
+              console.log(response);
+            })
+            .catch(error => {
+              console.log(error);
+            });
         } else {
-          this.desserts.push(this.editedItem);
+          this.occupant.push(this.editedItem);
         }
         for (let key in this.editedItem) {
           if (this.editedItem.hasOwnProperty(key)) {
@@ -319,6 +308,9 @@ export default {
         this.close();
       }
     }
+  },
+  mounted() {
+    this.occupant = this.populateOccupant();
   }
 };
 </script>

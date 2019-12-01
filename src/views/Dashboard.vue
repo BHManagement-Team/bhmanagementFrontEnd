@@ -16,7 +16,13 @@
               <v-spacer></v-spacer>
               <v-dialog v-model="dialog" max-width="500px">
                 <template v-slot:activator="{ on }">
-                  <v-btn color="default" dark class="mb-2" v-on="on">New Item</v-btn>
+                  <v-btn
+                    color="default"
+                    dark
+                    class="mb-2"
+                    @click="update = false"
+                    v-on="on"
+                  >New Item</v-btn>
                 </template>
                 <v-card>
                   <v-card-title>
@@ -77,7 +83,7 @@
         </v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <br>
+          <br />
           <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
           <v-btn class="ma-2" outlined color="success" @click="deleteItem(currentId)">Yes</v-btn>
         </v-card-actions>
@@ -93,7 +99,6 @@
 </style>
 <script>
 import axios from "axios";
-// function
 export default {
   data: () => ({
     confirm: false,
@@ -108,7 +113,7 @@ export default {
     ],
     room: [],
     editedIndex: -1,
-    editedItem: { roomFloor: 0, roomName: "", roomCapacity: 0, rentPrice: 0 }
+    editedItem: { roomFloor: "", roomName: "", roomCapacity: "", rentPrice: "" }
   }),
   computed: {
     formTitle() {
@@ -127,7 +132,7 @@ export default {
       axios
         .post("http://localhost:3000/bhm/retrieveAllRooms", { token: "sd" })
         .then(response => {
-          console.log(response);
+          console.log(response.data);
           var datax = response.data.data;
           this.room = datax;
         })
@@ -136,20 +141,21 @@ export default {
         });
     },
     editItem(item) {
-      this.editedIndex = this.room.indexOf(item);
+      this.editedIndex = this.room.indexOf(item-1);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     openDialog(id) {
       (this.confirm = true), (this.currentId = id);
     },
+
     deleteItem(id) {
       const index = this.room.indexOf(id);
       axios
         .post("http://localhost:3000/bhm/deleteRoomByID/" + id, { token: "sd" })
         .then(response => {
           console.log(response);
-          this.room.splice(index, 1);
+          this.room.splice(index-1, 1);
         })
         .catch(error => {
           console.log(error);
@@ -165,6 +171,7 @@ export default {
       }, 300);
     },
     save() {
+
       if (this.editedIndex > -1) {
         Object.assign(this.room[this.editedIndex], this.editedItem);
         alert("number is " + this.editedItem.number);
@@ -183,6 +190,7 @@ export default {
             console.log(error);
           });
       } else {
+      if (!this.update) {
         axios
           .post("http://localhost:3000/bhm/createRoom", {
             token: "fdsfasdf",
@@ -195,16 +203,42 @@ export default {
             alert('Room has been added!!!')
             this.room.push(response.data);
             (this.room = this.populateRoom()), (this.dialog = false);
+            this.room.push(response.data.data);
+            this.dialog = false;
           })
           .catch(error => {
             console.log(error);
           });
       }
+
       this.close();
     }
   },
   mounted() {
     this.populateRoom();
+
+    }
+  },
+  mounted() {
+    this.room = this.populateRoom();
+
   }
 };
+// if (!this.update) {
+//   axios
+//     .post("http://localhost:3000/bhm/createRoom", {
+//       token: "fdsfasdf",
+//       room_name: this.editedItem.roomName,
+//       room_floor: this.editedItem.roomFloor,
+//       room_capacity: this.editedItem.roomCapacity,
+//       room_price: this.editedItem.rentPrice
+//     }) //
+//     .then(response => {
+//       this.room.push(response.data.data);
+//       this.dialog = false;
+//     })
+//     .catch(error => {
+//       console.log(error);
+//     });
+// }
 </script>
