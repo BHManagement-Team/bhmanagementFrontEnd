@@ -136,7 +136,7 @@ export default {
         });
     },
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.room.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
@@ -167,8 +167,10 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.room[this.editedIndex], this.editedItem);
+        alert("number is " + this.editedItem.number);
         axios
-          .post("http:/localhost:3000/bhm/updateRoom?method=boolean", {
+          .post("http://localhost:3000/bhm/updateRoom", {
+            id: this.editedItem.number,
             room_name: this.editedItem.roomName,
             room_floor: this.editedItem.roomFloor,
             room_capacity: this.editedItem.roomCapacity,
@@ -190,19 +192,19 @@ export default {
             room_price: this.editedItem.rentPrice
           }) //
           .then(response => {
+            alert('Room has been added!!!')
             this.room.push(response.data);
-            (this.room = populateRoom()), (this.dialog = false);
-            console.log(response);
+            (this.room = this.populateRoom()), (this.dialog = false);
           })
           .catch(error => {
             console.log(error);
           });
       }
       this.close();
-    },
-    mounted() {
-      this.populateRoom();
     }
+  },
+  mounted() {
+    this.populateRoom();
   }
 };
 </script>

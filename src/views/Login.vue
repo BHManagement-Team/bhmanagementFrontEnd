@@ -63,7 +63,8 @@ export default {
       axios
         .post("http://localhost:3000/bhm/login", {
           username: this.username,
-          password: this.password
+          password: this.password,
+          token:"sdadfs"
         })
         .then(response => {
           console.log(response.data);
