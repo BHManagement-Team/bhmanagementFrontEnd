@@ -12,6 +12,14 @@
                 <v-toolbar-title>Username</v-toolbar-title>
                 <br />
                 <v-text-field
+                  label="Current username"
+                  prepend-icon="mdi-account"
+                  outlined
+                  v-model="username"
+                ></v-text-field>
+        
+                <br />
+                <v-text-field
                   label="New username"
                   prepend-icon="mdi-account"
                   outlined
@@ -80,9 +88,12 @@ export default {
 };
 </script>
 <style>
+template{
+  text-align: center
+}
 #margin {
+  margin: auto;
   max-width: 900px;
-  margin-left: 200px;
   margin-top: 100px;
 }
 .padding {

@@ -58,8 +58,7 @@ export default {
       password: ""
     };
   },
-  methods: {
-      
+  methods: { 
       login: function () {
         let email = this.username
         let password = this.password
