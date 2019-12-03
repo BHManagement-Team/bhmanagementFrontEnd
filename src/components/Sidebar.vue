@@ -61,11 +61,17 @@ export default {
     name: 'Sidebar',
     methods:{
       goto(link){   
-        this.$router.push({path:link});
           if(link=='/'){
-            localStorage.token="null";
+            this.logout();
+            
           }
+      },
+      logout: function () {
+        this.$store.dispatch('logout')
+        .then(() => {
+          this.$router.push('/')
+        })
       }
-    }
+    }, 
 }
 </script>
