@@ -1,6 +1,6 @@
 <template>
   <v-app>
-      <Sidebar v-if="LoginPage()"/>
+      <Sidebar v-if="$route.name !== 'Login' "/>
       <v-content>
         <router-view/>
       </v-content>
@@ -9,19 +9,13 @@
 
 <script>
 import Sidebar from "@/components/Sidebar.vue";
+
+
 export default {
   name: "App",
   components:{
     Sidebar
-  },
-  methods: {
-      LoginPage() {
-        if(this.$route.path == "/") {
-          return false
-        } else {
-          return true
-        }
-      }
-    }
+  }
+ 
 };
 </script>

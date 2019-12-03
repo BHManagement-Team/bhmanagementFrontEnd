@@ -6,17 +6,18 @@
           <v-icon left>mdi-account</v-icon>Profile Setting
         </v-tab>
         <v-tab-item>
-          <v-card flat>
+          <v-card>
             <v-card-text class="space">
-              <v-form>
+              <v-form class="size">
                 <v-toolbar-title>Username</v-toolbar-title>
                 <br />
                 <v-text-field
                   label="New username"
                   prepend-icon="mdi-account"
                   outlined
-                  v-model="currentPassword"
-                ></v-text-field><v-toolbar-title>Password</v-toolbar-title>
+                  v-model="username"
+                ></v-text-field>
+                <v-toolbar-title>Password</v-toolbar-title>
                 <br />
                 <v-text-field
                   label="Current password"
@@ -37,7 +38,7 @@
                   v-model="confirmPassword"
                 ></v-text-field>
                 <center>
-                  <v-btn class="ma-2" outlined color="success">Save Changes</v-btn>
+                  <v-btn class="ma-2" outlined color="success" @click="save()"> Save Changes</v-btn>
                 </center>
               </v-form>
             </v-card-text>
@@ -47,16 +48,50 @@
     </v-card>
   </div>
 </template>
+<script>
+import axios from 'axios'
+export default {
+  name: "settings",
+  data() {
+    return {
+      username: "",
+      currentPassword:"",
+      newPassword:"",
+      confirmPassword:""
+    };
+  },
+  methods:{
+    save(){
+      if(this.newPassword === this.confirmPassword){
+        axios
+          .post("http://localhost:3000/bhm/update", {username:this.username,oldPassword:this.currentPassword,newPassword:this.newPassword})
+          .then(response => {
+            console.log(response);
+            
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+      
+    }
+
+  }
+};
+</script>
 <style>
 #margin {
   max-width: 900px;
-  margin-left: 500px;
+  margin-left: 200px;
   margin-top: 100px;
 }
 .padding {
-  max-width: 500px!important;
+  max-width: 600px !important;
+  font-size: 50px !important;
+  padding: 20px !important;
 }
 .space {
+  font-size: 5px !important;
   padding: 25px;
 }
 </style>

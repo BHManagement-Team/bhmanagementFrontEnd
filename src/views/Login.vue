@@ -10,12 +10,12 @@
                 <v-card-text>
                   <v-form>
                     <center>
-                      <img src="~@/assets/bhmLogo.png">
+                      <img src="~@/assets/bhmLogo.png" />
                       <h3>BHManagement System</h3>
                     </center>
                     <v-text-field
                       v-model="username"
-                      label="Login"
+                      label="username"
                       name="login"
                       prepend-icon="mdi-account"
                       type="text"
@@ -34,8 +34,9 @@
                   <v-spacer></v-spacer>
                   <!-- <router-link class="btnLogin" :to="'/toDashboard'"> -->
                   <v-btn v-on:click="login" color="primary">Login</v-btn>
-                  <br>
-                  <br>
+                  <!-- @click='login()' -->
+                  <br />
+                  <br />
                   <!-- </router-link> -->
                   <v-spacer></v-spacer>
                 </v-card-actions>
@@ -48,26 +49,26 @@
   </div>
 </template>
 <script>
+console.log(localStorage.token)
 export default {
-  name: "btnLogin",
-  data(){
-    return{
+  name: "Login",
+  data() {
+    return {
       username: "",
       password: ""
-    }
+    };
   },
   methods: {
-    login() {
-      if(this.username == "admin" && this.password == "admin"){
-        this.$router.push({name: 'toDashboard'})
-      }else{
-        alert("Invalid credentials")
-      }
-    }
+      
+      login: function () {
+        let email = this.username
+        let password = this.password
+        this.$store.dispatch('login', { email, password })
+       .then(() => this.$router.push('/dashboard'))
+       .catch(err => console.log(err))
+      }      
   },
-  props:{
-    
-  }
+  props: {}
 };
 </script>
 <style>

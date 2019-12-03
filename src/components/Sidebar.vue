@@ -1,9 +1,8 @@
 <template>
     <v-navigation-drawer 
-    app
+      app
       expand-on-hover
-     
-      hide-overlay
+      hide-overlay 
     >
       <template v-slot:prepend>
         <v-list>
@@ -33,19 +32,19 @@
           <v-list-item-icon>
             <v-icon>mdi-blur-linear</v-icon>
           </v-list-item-icon>
-          <v-list-item-title  @click="goto('/toDashboard')">Room Management</v-list-item-title>
+          <v-list-item-title  @click="goto('/dashboard')">Room Management</v-list-item-title>
         </v-list-item>
         <v-list-item link >
           <v-list-item-icon>
             <v-icon>mdi-account-multiple</v-icon>
           </v-list-item-icon>
-          <v-list-item-title @click="goto('/toOccupantManagement')">Occupant Management</v-list-item-title>
+          <v-list-item-title @click="goto('/occupantmanagement')">Occupant Management</v-list-item-title>
         </v-list-item>
         <v-list-item link >
           <v-list-item-icon>
             <v-icon>mdi-settings</v-icon>
           </v-list-item-icon>
-          <v-list-item-title @click="goto('toSettings')">Settings</v-list-item-title>
+          <v-list-item-title @click="goto('/settings')">Settings</v-list-item-title>
         </v-list-item>
         <v-list-item link >
           <v-list-item-icon>
@@ -61,9 +60,18 @@
 export default {
     name: 'Sidebar',
     methods:{
-      goto(link){
-        this.$router.push({path:link});
+      goto(link){   
+          if(link=='/'){
+            this.logout();
+            
+          }
+      },
+      logout: function () {
+        this.$store.dispatch('logout')
+        .then(() => {
+          this.$router.push('/')
+        })
       }
-    }
+    }, 
 }
 </script>
