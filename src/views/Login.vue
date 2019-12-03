@@ -15,7 +15,7 @@
                     </center>
                     <v-text-field
                       v-model="username"
-                      label="Login"
+                      label="username"
                       name="login"
                       prepend-icon="mdi-account"
                       type="text"
@@ -50,6 +50,7 @@
 </template>
 <script>
 import axios from "axios";
+console.log(localStorage.token)
 export default {
   name: "Login",
   data() {
@@ -66,12 +67,13 @@ export default {
           password: this.password
         })
         .then(response => {
-          console.log(response.data);
-          if (this.username == "admin" && this.password == "admin") {
+          var token=response.data.token;
+          if(token!=null){          
+            localStorage.setItem("token",token)
+            console.log("consoling "+localStorage.token)
             this.$router.push({ name: "Dashboard" });
-          } else {
-            alert("Invalid credentials");
-          }
+          }    
+            
         })
         .catch(function(error) {
           console.log(error);

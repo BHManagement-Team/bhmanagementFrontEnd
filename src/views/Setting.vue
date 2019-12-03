@@ -10,15 +10,15 @@
             <v-card-text class="space">
               <v-form class="size">
                 <v-toolbar-title>Username</v-toolbar-title>
-                <br>
+                <br />
                 <v-text-field
                   label="New username"
                   prepend-icon="mdi-account"
                   outlined
-                  v-model="currentPassword"
+                  v-model="username"
                 ></v-text-field>
                 <v-toolbar-title>Password</v-toolbar-title>
-                <br>
+                <br />
                 <v-text-field
                   label="Current password"
                   prepend-icon="mdi-lock"
@@ -38,7 +38,7 @@
                   v-model="confirmPassword"
                 ></v-text-field>
                 <center>
-                  <v-btn class="ma-2" outlined color="success">Save Changes</v-btn>
+                  <v-btn class="ma-2" outlined color="success" @click="save()"> Save Changes</v-btn>
                 </center>
               </v-form>
             </v-card-text>
@@ -48,6 +48,37 @@
     </v-card>
   </div>
 </template>
+<script>
+import axios from 'axios'
+export default {
+  name: "settings",
+  data() {
+    return {
+      username: "",
+      currentPassword:"",
+      newPassword:"",
+      confirmPassword:""
+    };
+  },
+  methods:{
+    save(){
+      if(this.newPassword === this.confirmPassword){
+        axios
+          .post("http://localhost:3000/bhm/update", {username:this.username,oldPassword:this.currentPassword,newPassword:this.newPassword})
+          .then(response => {
+            console.log(response);
+            
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+      
+    }
+
+  }
+};
+</script>
 <style>
 #margin {
   max-width: 900px;
@@ -60,7 +91,7 @@
   padding: 20px !important;
 }
 .space {
-  font-size:5px !important;
+  font-size: 5px !important;
   padding: 25px;
 }
 </style>

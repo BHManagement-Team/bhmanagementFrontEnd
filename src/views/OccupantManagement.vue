@@ -77,12 +77,15 @@
             >PAYMENT DETAILS</v-btn>
             <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
+          <template v-slot:no-data>
+            <v-btn color="primary" @click="initialize">Reset</v-btn>
+          </template>
         </v-data-table>
         <!-- PAYMENT HISTORY -->
         <v-dialog v-model="payment" max-width="800px">
           <v-data-table
             :headers="paymentHeaders"
-            :items="payment"
+            :items="occupant"
             sort-by="roomName"
             class="elevation-1"
           >
@@ -153,7 +156,6 @@
 import axios from "axios";
 export default {
   data: () => ({
-    occupant: [],
     valid: true,
     name: "",
     nameRules: [v => !!v || "Name is required"],
@@ -189,10 +191,10 @@ export default {
       {
         text: "Room Floor",
         align: "left",
-        value: "roomFloor"
+        value: "room_nloor"
       },
-      { text: "Room Name", value: "roomName", sortable: false },
-      { text: "Occupant", value: "roomOccupant", sortable: false },
+      { text: "Room Name", value: "room_name", sortable: false },
+      { text: "Occupant", value: "occupant_name", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
     editedIndex: -1,
@@ -211,7 +213,6 @@ export default {
       contact: ""
     }
   }),
-
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "ADD OCCUPANT" : "OCCUPANT DETAILS";
@@ -220,36 +221,35 @@ export default {
       return this.editedIndex === -1 ? "ADD PAYMENT" : "PAYMENT DETAILS";
     }
   },
-
   watch: {
     dialog(val) {
       val || this.close();
     }
   },
+  
   methods: {
-    populateOccupant() {
-      axios
-        .post("http://localhost:3000/bhm/retrieveAllOccupants", { token: "sd" })
-        .then(response => {
-          console.log(response);
-          this.occupant = response.data.data;
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
+    populateOccupant() {      
+      axios        
+      .post("http://localhost:3000/bhm/retrieveAllOccupants", { token: "sd" })        
+      .then(response => {          
+        console.log(response);          
+        this.occupant = response.data.data;        
+      })        
+      .catch(error => {          
+        console.log(error);        
+        });    
+      },
+
     editPayment(item) {
       this.editedIndex = this.occupant.indexOf(item);
       this.editedPayment = Object.assign({}, item);
       this.dialog = true;
     },
-
     editItem(item) {
       this.editedIndex = this.occupant.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
-
     deleteItem(item) {
       const index = this.occupant.indexOf(item);
       confirm("Are you sure you want to delete this?") &&
@@ -274,28 +274,13 @@ export default {
     save() {
       if (this.$refs.form.validate()) {
         this.snackbar = true;
-        axios
-          .post("http://localhost:3000/bhm/createOccupant", { token: "DSFSDF" })
-          .then(response => {
-            this.occupant.push(response.data.data);
-          });
+        this.axios
+        .post('http://localhost:3000/bhm/createOccupant')
+        .then(response =>{
+          this.occupant.push(response.data.data)
+        })
         if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem);
-          alert("number is " + this.editedItem.number);
-          axios
-            .post("http://localhost:3000/bhm/updateRoom", {
-              id: this.editedItem.number,
-              room_name: this.editedItem.roomName,
-              room_floor: this.editedItem.roomFloor,
-              occupant_name: this.editedItem.occupant_name,
-              occupant_email: this.editedItem.occupant_contact
-            })
-            .then(response => {
-              console.log(response);
-            })
-            .catch(error => {
-              console.log(error);
-            });
+          Object.assign(this.occupant[this.editedIndex], this.editedItem);
         } else {
           this.occupant.push(this.editedItem);
         }
@@ -309,8 +294,12 @@ export default {
       }
     }
   },
-  mounted() {
-    this.occupant = this.populateOccupant();
+  mounted() { 
+    if(localStorage.token!="null"){
+     this.occupant = this.populateOccupant();  
+    }else{
+      this.$router.push({path:"/"});
+    }   
   }
 };
 </script>
