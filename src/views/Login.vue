@@ -30,7 +30,7 @@
                     ></v-text-field>
                   </v-form>
                 </v-card-text>
-                <center><p>hi</p></center>
+                <center  v-bind:style="{ color: color }" id="warnMessage">{{warning}}</center>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <!-- <router-link class="btnLogin" :to="'/toDashboard'"> -->
@@ -40,14 +40,23 @@
                   <br />
                   <!-- </router-link> -->
                   <v-spacer></v-spacer>
+                  
                 </v-card-actions>
+                  
               </v-card>
+            
             </v-flex>
+            
           </v-layout>
+          
         </v-container>
+       
       </v-content>
+      
     </v-app>
+     
   </div>
+  
 </template>
 <script>
 console.log(localStorage.token)
@@ -55,9 +64,10 @@ export default {
   name: "Login",
   data() {
     return {
-      warning:"",
+      warning:".",
       username: "",
-      password: ""
+      password: "",
+      color:'white',
     };
   },
   methods: { 
@@ -66,11 +76,19 @@ export default {
         let password = this.password
         this.$store.dispatch('login', { email, password })
        .then((res) =>{
-        this.warning=JSON.stringify(res.data.message),
+        this.warningfunction(res)
+      
          this.$router.push('/dashboard')
        }
        )
-       .catch(err => console.log(err))
+       .catch(err => console.log("error encountered while logging in: "+err))
+      },
+      warningfunction:function(res){
+        
+        this.color='red'
+
+        console.log("i made it: "+JSON.stringify(res.data.message))
+        this.warning=JSON.stringify(res.data.message);
       }
             
   },
@@ -93,7 +111,7 @@ img {
   background-size: cover;
   transform: scale(1.1);
 }
-p{
+#warnMessage{
   color: red;
 }
 </style>

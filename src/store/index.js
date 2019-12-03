@@ -33,8 +33,7 @@ export default new Vuex.Store({
                 commit('auth_request')
                 
                 axios.post('http://localhost:3000/bhm/login',{username:user.email,password:user.password})
-                    .then(resp => {
-                        
+                    .then(resp => {                      
                         const token = resp.data.token
                         const user = resp.data.user
                         localStorage.setItem('token', token)
