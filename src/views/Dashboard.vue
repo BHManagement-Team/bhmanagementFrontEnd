@@ -169,10 +169,11 @@ export default {
   },
   methods: {
     editItem(item) {
-      this.editedIndex = this.room.indexOf(item);
+      this.editedIndex = this.room.indexOf(item-1);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
+<<<<<<< HEAD
     openDialog(id) {   
       this.confirm = true, 
      this.currentId = id    
@@ -189,6 +190,24 @@ export default {
         console.log(error);        
       });      
       this.confirm = false;    
+=======
+    openDialog(id) {
+      (this.confirm = true), (this.currentId = id);
+    },
+
+    deleteItem(id) {
+      const index = this.room.indexOf(id);
+      axios
+        .post("http://localhost:3000/bhm/deleteRoomByID/" + id, { token: "sd" })
+        .then(response => {
+          console.log(response);
+          this.room.splice(index-1, 1);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      this.confirm = false;
+>>>>>>> 87fddffd2a2f2da4d0cf9e0af489f3a21d46461a
     },
     close() {
       this.dialog = false;
@@ -199,6 +218,7 @@ export default {
       }, 300);
     },
     save() {
+<<<<<<< HEAD
       if (this.editedIndex > -1) {
         Object.assign(this.room[this.editedIndex], this.editedItem);
         axios
@@ -210,19 +230,50 @@ export default {
           .then(response => {
             console.log(response);
             
+=======
+
+      if (this.editedIndex > -1) {
+        Object.assign(this.room[this.editedIndex], this.editedItem);
+        alert("number is " + this.editedItem.number);
+        axios
+          .post("http://localhost:3000/bhm/updateRoom", {
+            id: this.editedItem.number,
+            room_name: this.editedItem.roomName,
+            room_floor: this.editedItem.roomFloor,
+            room_capacity: this.editedItem.roomCapacity,
+            room_price: this.editedItem.rentPrice
+          })
+          .then(response => {
+            console.log(response);
+>>>>>>> 87fddffd2a2f2da4d0cf9e0af489f3a21d46461a
           })
           .catch(error => {
             console.log(error);
           });
       } else {
+<<<<<<< HEAD
         this.room.push(this.editedItem);
+=======
+      if (!this.update) {
+>>>>>>> 87fddffd2a2f2da4d0cf9e0af489f3a21d46461a
         axios
           .post("http://localhost:3000/bhm/createRoom", {
             room_name: this.editedItem.roomName,
             room_floor: this.editedItem.roomFloor,
             room_capacity: this.editedItem.roomCapacity,
+<<<<<<< HEAD
             room_price: this.editedItem.rentPrice,
             token :localStorage.token
+=======
+            room_price: this.editedItem.rentPrice
+          }) //
+          .then(response => {
+            alert('Room has been added!!!')
+            this.room.push(response.data);
+            (this.room = this.populateRoom()), (this.dialog = false);
+            this.room.push(response.data.data);
+            this.dialog = false;
+>>>>>>> 87fddffd2a2f2da4d0cf9e0af489f3a21d46461a
           })
           .then( 
             
@@ -232,8 +283,23 @@ export default {
             console.log(error);
           });
       }
+<<<<<<< HEAD
       this.close();
     }
+=======
+
+      this.close();
+    }
+  },
+  mounted() {
+    this.populateRoom();
+
+    }
+  },
+  mounted() {
+    this.room = this.populateRoom();
+
+>>>>>>> 87fddffd2a2f2da4d0cf9e0af489f3a21d46461a
   }
 };
 </script>
