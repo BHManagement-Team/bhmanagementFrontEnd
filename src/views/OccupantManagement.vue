@@ -25,17 +25,6 @@
                       <span class="headline">{{ formTitle }}</span>
                     </v-card-title>
 
-<<<<<<< HEAD
-                  <v-card-text>
-                    <v-container>
-                      <v-text-field v-model="editedItem.roomFloor" label="Room Floor" prepend-icon="mdi-home-floor-l"></v-text-field>
-                      <v-text-field v-model="editedItem.roomName" label="Room Name" prepend-icon="mdi-home-edit"></v-text-field>
-                      <v-text-field v-model="editedItem.roomOccupant" label="Name" prepend-icon="mdi-account"> </v-text-field>
-                      <v-text-field v-model="editedItem.email" label="Email" :rules="emailRules" prepend-icon="mdi-email"></v-text-field>
-                      <v-text-field v-model="editedItem.contact" label="Contact" prepend-icon="mdi-cellphone-iphone"></v-text-field>
-                    </v-container>
-                  </v-card-text>
-=======
                     <v-card-text>
                       <v-container>
                         <v-text-field
@@ -61,7 +50,6 @@
                         ></v-text-field>
                       </v-container>
                     </v-card-text>
->>>>>>> origin/HannahMaePeliño
 
                     <v-card-actions>
                       <v-spacer></v-spacer>
@@ -218,18 +206,7 @@ export default {
       contact: ""
     },
     defaultItem: {
-<<<<<<< HEAD
-      roomFloor: 0,
-      roomName: "",
-      roomOccupant: "",
-      email: "",
-      contact: ""
-    },
-    paymentItem: {
-      roomFloor: '',
-=======
       roomFloor: "",
->>>>>>> origin/HannahMaePeliño
       roomName: "",
       roomOccupant: "",
       email: "",
