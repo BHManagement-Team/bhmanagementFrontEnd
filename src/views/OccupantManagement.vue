@@ -227,14 +227,6 @@ export default {
       val || this.close();
     }
   },
-   created() {
-    if(localStorage.token!="null"){
-      this.initialize();
-    }else{
-      this.$router.push({path:"/"});
-    }
-  },
-  
   methods: {
     initialize() {
       this.desserts = [

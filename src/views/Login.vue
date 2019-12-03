@@ -49,7 +49,6 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 console.log(localStorage.token)
 export default {
   name: "Login",
@@ -60,26 +59,14 @@ export default {
     };
   },
   methods: {
-    login() {
-      axios
-        .post("http://localhost:3000/bhm/login", {
-          username: this.username,
-          password: this.password
-        })
-        .then(response => {
-          var token=response.data.token;
-          if(token!=null){          
-            localStorage.setItem("token",token)
-            console.log("consoling "+localStorage.token)
-            this.$router.push({ name: "Dashboard" });
-          }    
-            
-        })
-        .catch(function(error) {
-          console.log(error);
-          alert("Invalid credentails");
-        });
-    }
+      
+      login: function () {
+        let email = this.username
+        let password = this.password
+        this.$store.dispatch('login', { email, password })
+       .then(() => this.$router.push('/dashboard'))
+       .catch(err => console.log(err))
+      }      
   },
   props: {}
 };

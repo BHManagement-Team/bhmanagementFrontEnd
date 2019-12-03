@@ -129,15 +129,6 @@ export default {
         : "Update Existing Room Details";
     }
   },
-  mounted() {
-    if(localStorage.token!="null"){
-      this.desserts=populateRoom()
-    }else{
-      this.$router.push({path:"/"});
-    }
-  },
-  
- 
   watch: {
     dialog(val) {
       val || this.close();
