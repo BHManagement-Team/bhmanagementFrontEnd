@@ -30,6 +30,7 @@
                     ></v-text-field>
                   </v-form>
                 </v-card-text>
+                <center><p>hi</p></center>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <!-- <router-link class="btnLogin" :to="'/toDashboard'"> -->
@@ -54,6 +55,7 @@ export default {
   name: "Login",
   data() {
     return {
+      warning:"",
       username: "",
       password: ""
     };
@@ -63,9 +65,14 @@ export default {
         let email = this.username
         let password = this.password
         this.$store.dispatch('login', { email, password })
-       .then(() => this.$router.push('/dashboard'))
+       .then((res) =>{
+        this.warning=JSON.stringify(res.data.message),
+         this.$router.push('/dashboard')
+       }
+       )
        .catch(err => console.log(err))
-      }      
+      }
+            
   },
   props: {}
 };
@@ -85,5 +92,8 @@ img {
     url("https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940");
   background-size: cover;
   transform: scale(1.1);
+}
+p{
+  color: red;
 }
 </style>

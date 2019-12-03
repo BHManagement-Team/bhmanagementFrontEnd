@@ -23,7 +23,7 @@
                   label="New username"
                   prepend-icon="mdi-account"
                   outlined
-                  v-model="username"
+                  v-model="newUsername"
                 ></v-text-field>
                 <v-toolbar-title>Password</v-toolbar-title>
                 <br />
@@ -63,6 +63,7 @@ export default {
   data() {
     return {
       username: "",
+      newUsername:"",
       currentPassword:"",
       newPassword:"",
       confirmPassword:""

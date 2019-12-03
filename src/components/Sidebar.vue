@@ -61,10 +61,12 @@ export default {
     name: 'Sidebar',
     methods:{
       goto(link){
-        this.$router.push(link)
+        
           if(link=='/'){
             this.logout();
             
+          }else{
+            this.$router.push(link)
           }
       },
       logout: function () {

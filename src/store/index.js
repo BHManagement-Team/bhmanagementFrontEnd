@@ -31,9 +31,10 @@ export default new Vuex.Store({
         login({ commit }, user) {
             return new Promise((resolve, reject) => {
                 commit('auth_request')
-                console.log(user)
+                
                 axios.post('http://localhost:3000/bhm/login',{username:user.email,password:user.password})
                     .then(resp => {
+                        
                         const token = resp.data.token
                         const user = resp.data.user
                         localStorage.setItem('token', token)
@@ -43,6 +44,7 @@ export default new Vuex.Store({
                         resolve(resp)
                     })
                     .catch(err => {
+                        console.log("failed connection in login "+err)
                         commit('auth_error')
                         localStorage.removeItem('token')
                         reject(err)
