@@ -69,7 +69,7 @@
           </template>
           <template v-slot:item.action="{ item }">
             <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
-            <v-btn class="text" outlined color="primary" @click="payment = true">PAYMENT DETAILS</v-btn>
+            <v-btn class="text" outlined color="primary" @click="paymentDetail(item)">PAYMENT DETAILS</v-btn>
             <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
           <template v-slot:no-data>
@@ -80,7 +80,7 @@
         <v-dialog v-model="payment" max-width="800px">
           <v-data-table
             :headers="paymentHeaders"
-            :items="occupant"
+            :items="paymentHistory"
             sort-by="roomName"
             class="elevation-1"
           >
@@ -101,13 +101,9 @@
 
                     <v-card-text>
                       <v-container>
+                        
                         <v-text-field
-                          v-model="editedItem.roomFloor"
-                          label="Payment Date"
-                          type="Date"
-                        ></v-text-field>
-                        <v-text-field
-                          v-model="editedItem.roomName"
+                          v-model="editedPayment.paymentAmount"
                           label="Payment Amount"
                           type="Number"
                         ></v-text-field>
@@ -131,7 +127,7 @@
                   <v-card-text>
                     <v-container>
                       <v-text-field
-                        v-model="editedItem.roomName"
+                        v-model="editedPayment.paymentAmount"
                         label="Payment Amount"
                         type="Number"
                       ></v-text-field>
@@ -194,9 +190,9 @@ export default {
       {
         text: "Payment Date",
         align: "Amount",
-        value: "paymentDate"
+        value: "billing_date"
       },
-      { text: "Amount", value: "paymentAmount", sortable: false },
+      { text: "Amount", value: "amount", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
     editedIndex: -1,
@@ -221,12 +217,14 @@ export default {
     ],
     editedIndex: -1,
     editedItem: {
+      id:"",
       roomFloor: "",
       roomName: "",
       roomOccupant: "",
       email: "",
       contact: ""
     },
+    paymentHistory:[],
     occupant: [],
     defaultItem: {
       roomFloor: "",
@@ -273,8 +271,10 @@ export default {
         });
     },
     editItem(item) {
+
       this.editedIndex = this.occupant.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      console.log(this.editedItem)
       this.dialog = true;
     },
     editPayment(item) {
@@ -309,7 +309,9 @@ export default {
           console.log("edit");
           Object.assign(this.occupant[this.editedIndex], this.editedItem);
         } else {
-          axios
+          console.log(this.payment)
+          
+            axios
             .post("http://localhost:3000/bhm/createOccupant", {
               token: localStorage.token,
               room_name: this.editedItem.roomName,
@@ -339,14 +341,61 @@ export default {
             .catch(error => {
               console.log(error);
             });
-        }
+        
       }
+          }
+       
     },
-
+    paymentDetail(item){
+       this.editedItem = Object.assign({}, item);
+      axios
+            .post("http://localhost:3000/bhm/retrievePaymentByID/"+this.editedItem._id,{token:this.$store.state.token})
+            .then(response => {
+               this.paymentHistory=response.data.data
+              // this.occupant.push({
+              //   token: response.data,
+              //   room_name: this.editedItem.roomName,
+              //   room_floor: this.editedItem.roomFloor,
+              //   occupant_name: this.editedItem.roomOccupant,
+              //   occupant_email: this.editedItem.email,
+              //   occupant_contact: this.editedItem.contact
+              // });
+              this.modalPayment = false;
+            })
+            .catch(error => {
+              console.log(error);
+            });
+     
+      this.payment=true
+    },
     //saving for payment
     closePaymentModal() {
-      this.paymentEdit = false;
-      this.modalPayment = false;
+     console.log(this.editedIndex)
+     if(this.editedIndex > -1){
+       console.log("edit")
+        this.paymentEdit = false;
+     }else{     
+       console.log(this.editedPayment.paymentAmount)
+       axios
+            .post("http://localhost:3000/bhm/payment/"+this.editedItem._id,{token:this.$store.state.token,amount:this.editedPayment.paymentAmount})
+            .then(response => {
+               console.log(response)
+              // this.occupant.push({
+              //   token: response.data,
+              //   room_name: this.editedItem.roomName,
+              //   room_floor: this.editedItem.roomFloor,
+              //   occupant_name: this.editedItem.roomOccupant,
+              //   occupant_email: this.editedItem.email,
+              //   occupant_contact: this.editedItem.contact
+              // });
+              this.modalPayment = false;
+            })
+            .catch(error => {
+              console.log(error);
+            });
+      
+     }
+     
     }
   }
 };
