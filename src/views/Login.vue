@@ -10,7 +10,7 @@
                 <v-card-text>
                   <v-form>
                     <center>
-                      <img src="~@/assets/bhmLogo.png" />
+                      <img src="~@/assets/bhmLogo.png">
                       <h3>BHManagement System</h3>
                     </center>
                     <v-text-field
@@ -30,13 +30,19 @@
                     ></v-text-field>
                   </v-form>
                 </v-card-text>
+                <center
+                  prepend-icon="mdi-lock"
+                  v-bind:style="{ color: color }"
+                  id="warnMessage"
+                >{{warning}}</center>
+
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <!-- <router-link class="btnLogin" :to="'/toDashboard'"> -->
                   <v-btn v-on:click="login" color="primary">Login</v-btn>
                   <!-- @click='login()' -->
-                  <br />
-                  <br />
+                  <br>
+                  <br>
                   <!-- </router-link> -->
                   <v-spacer></v-spacer>
                 </v-card-actions>
@@ -49,25 +55,37 @@
   </div>
 </template>
 <script>
-console.log(localStorage.token)
+console.log(localStorage.token);
 export default {
   name: "Login",
   data() {
     return {
+      warning: "",
       username: "",
-      password: ""
+      password: "",
+      color: "white"
     };
   },
   methods: {
-      
-      login: function () {
-        let email = this.username
-        let password = this.password
-        this.$store.dispatch('login', { email, password })
-       .then(() => this.$router.push('/dashboard'))
-       .catch(err => console.log(err))
-      }      
-  },
+    login: function() {
+      let email = this.username;
+      let password = this.password;
+      this.$store
+        .dispatch("login", { email, password })
+        .then(res => {
+          this.warningfunction(res);
+          this.$router.push("/dashboard");
+        })
+        .catch(err =>
+          console.log("error encountered while logging in: " + err)
+        );
+    },
+    warningfunction: function(res) {
+      this.color = "red";
+      console.log("i made it: " + JSON.stringify(res.data.message));
+      this.warning = JSON.stringify(res.data.message);
+    }
+  },  
   props: {}
 };
 </script>

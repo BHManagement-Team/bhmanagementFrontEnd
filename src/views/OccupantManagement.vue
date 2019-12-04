@@ -167,6 +167,7 @@ export default {
     modalPayment: false,
     payment: false,
     dialog: false,
+    occupant:[],
     //payment section
     paymentHeaders: [
       {
