@@ -69,12 +69,7 @@
           </template>
           <template v-slot:item.action="{ item }">
             <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
-            <v-btn
-              class="text"
-              outlined
-              color="primary"
-              @click="payment = true,editedPayment(item)"
-            >PAYMENT DETAILS</v-btn>
+            <v-btn class="text" outlined color="primary" @click="payment = true">PAYMENT DETAILS</v-btn>
             <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
           <template v-slot:no-data>
@@ -127,6 +122,29 @@
                   </v-card>
                 </v-dialog>
               </v-toolbar>
+              <v-dialog v-model="paymentEdit" max-width="500px">
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">{{paymentTitle}}</span>
+                  </v-card-title>
+
+                  <v-card-text>
+                    <v-container>
+                      <v-text-field
+                        v-model="editedItem.roomName"
+                        label="Payment Amount"
+                        type="Number"
+                      ></v-text-field>
+                    </v-container>
+                  </v-card-text>
+
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn class="ma-2" outlined color="error" @click="closePaymentModal()">Cancel</v-btn>
+                    <v-btn class="ma-2" outlined color="success" @click="closePaymentModal()">Save</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
             </template>
             <template v-slot:item.action="{ item }">
               <v-btn class="text" outlined color="success" @click="editPayment(item)">EDIT PAYMENT</v-btn>
@@ -152,6 +170,9 @@
   margin-left: 10px;
 }
 </style>
+
+
+
 <script>
 import axios from "axios";
 export default {
@@ -164,6 +185,7 @@ export default {
       v => !!v || "E-mail is required",
       v => /.+@.+\..+/.test(v) || "E-mail must be valid"
     ],
+    paymentEdit: false,
     modalPayment: false,
     payment: false,
     dialog: false,
@@ -205,7 +227,7 @@ export default {
       email: "",
       contact: ""
     },
-    occupant:[],
+    occupant: [],
     defaultItem: {
       roomFloor: "",
       roomName: "",
@@ -227,45 +249,51 @@ export default {
       val || this.close();
     }
   },
-  mounted(){
-    this.populateOccupant()
+  mounted() {
+    this.populateOccupant();
   },
   methods: {
-    populateOccupant() {     
-      axios        
-      .post("http://localhost:3000/bhm/retrieveAllOccupants", { token:this.$store.state.token})        
-      .then(response => {          
-                 
-        this.occupant = response.data.data;      
-      })        
-      .catch(error => {          
-        console.log(error);        
-        });    
-      },
+    paying() {
+      this.payDialog = true;
+    },
 
-    editPayment(item) {
-      this.editedIndex = this.occupant.indexOf(item);
-      this.editedPayment = Object.assign({}, item);
-      this.dialog = true;
+    //retrieve occupants
+    populateOccupant() {
+      axios
+        .post("http://localhost:3000/bhm/retrieveAllOccupants", {
+          token: this.$store.state.token
+        })
+        .then(response => {
+          console.log("this is the value of response after mounting: ");
+          console.log(response);
+          this.occupant = response.data.data;
+        })
+        .catch(error => {
+          console.log("error in populating: " + error);
+        });
     },
     editItem(item) {
       this.editedIndex = this.occupant.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
+    editPayment(item) {
+      console.log("this it the value of item in editing payment: " + item);
+      this.editedIndex = 1;
+      this.paymentEdit = true;
+    },
     deleteItem(item) {
       const index = this.occupant.indexOf(item);
       confirm("Are you sure you want to delete this?") &&
         this.occupant.splice(index, 1);
     },
-    closePaymentModal() {
-      this.modalPayment = false;
-    },
+    //after closing for accounts
     close() {
       this.$refs.form.resetValidation();
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
+        this.payDialog = false;
       }, 300);
       for (let key in this.editedItem) {
         if (this.editedItem.hasOwnProperty(key)) {
@@ -274,26 +302,52 @@ export default {
       }
       this.dialog = false;
     },
+    //for accounts only
     save() {
-      if (this.$refs.form.validate()) { 
-        
+      if (this.$refs.form.validate()) {
         if (this.editedIndex > -1) {
-          console.log("edited account")
+          console.log("edit");
           Object.assign(this.occupant[this.editedIndex], this.editedItem);
         } else {
-           console.log("add account")
-          this.occupant.push(this.editedItem);
+          axios
+            .post("http://localhost:3000/bhm/createOccupant", {
+              token: localStorage.token,
+              room_name: this.editedItem.roomName,
+              room_floor: this.editedItem.roomFloor,
+              occupant_name: this.editedItem.roomOccupant,
+              occupant_email: this.editedItem.email,
+              occupant_contact: this.editedItem.contact
+            })
+            .then(response => {
+           
+              this.occupant.push({
+                token: response.data,
+                room_name: this.editedItem.roomName,
+                room_floor: this.editedItem.roomFloor,
+                occupant_name: this.editedItem.roomOccupant,
+                occupant_email: this.editedItem.email,
+                occupant_contact: this.editedItem.contact
+              });
+              for (let key in this.editedItem) {
+                if (this.editedItem.hasOwnProperty(key)) {
+                  this.editedItem[key] = "";
+                }
+              }
+              this.$refs.form.resetValidation();
+              this.close();
+            })
+            .catch(error => {
+              console.log(error);
+            });
         }
-        for (let key in this.editedItem) {
-          if (this.editedItem.hasOwnProperty(key)) {
-            this.editedItem[key] = "";
-          }
-        }
-        this.$refs.form.resetValidation();
-        this.close();
       }
+    },
+
+    //saving for payment
+    closePaymentModal() {
+      this.paymentEdit = false;
+      this.modalPayment = false;
     }
   }
- 
 };
 </script>

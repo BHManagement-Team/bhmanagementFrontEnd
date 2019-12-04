@@ -59,7 +59,6 @@
   
 </template>
 <script>
-console.log(localStorage.token)
 export default {
   name: "Login",
   data() {
@@ -83,11 +82,8 @@ export default {
        )
        .catch(err => console.log("error encountered while logging in: "+err))
       },
-      warningfunction:function(res){
-        
+      warningfunction:function(res){     
         this.color='red'
-
-        console.log("i made it: "+JSON.stringify(res.data.message))
         this.warning=JSON.stringify(res.data.message);
       }
             

@@ -100,7 +100,6 @@ function populateRoom(){
       axios
       .post("http://localhost:3000/bhm/retrieveAllRooms",{token:localStorage.token})
       .then(response => {
-        console.log(response)
         var datax = response.data.data;
         var counter = 0;
         for (counter; counter < datax.length; counter++) {
