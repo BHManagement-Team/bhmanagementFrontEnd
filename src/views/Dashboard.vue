@@ -247,7 +247,7 @@ export default {
         })
         .then(response => {
           console.log(response);
-          this.room.splice(index - 1, 1);
+          this.room.splice(index -1, 1);
         })
         .catch(error => {
           console.log(error);
