@@ -78,7 +78,7 @@
             <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
           <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+            <!-- <v-btn color="primary" @click="initialize">Reset</v-btn> -->
           </template>
         </v-data-table>
         <!-- PAYMENT HISTORY -->
@@ -132,7 +132,7 @@
               <v-btn class="text" outlined color="success" @click="editPayment(item)">EDIT PAYMENT</v-btn>
             </template>
             <template v-slot:no-data>
-              <v-btn color="primary" @click="initialize">Reset</v-btn>
+              <!-- <v-btn color="primary" @click="initialize">Reset</v-btn> -->
             </template>
           </v-data-table>
         </v-dialog>
@@ -191,7 +191,7 @@ export default {
       {
         text: "Room Floor",
         align: "left",
-        value: "room_nloor"
+        value: "room_floor"
       },
       { text: "Room Name", value: "room_name", sortable: false },
       { text: "Occupant", value: "occupant_name", sortable: false },
@@ -205,6 +205,7 @@ export default {
       email: "",
       contact: ""
     },
+    occupant:[],
     defaultItem: {
       roomFloor: "",
       roomName: "",
@@ -226,14 +227,16 @@ export default {
       val || this.close();
     }
   },
-  
+  mounted(){
+    this.populateOccupant()
+  },
   methods: {
-    populateOccupant() {      
+    populateOccupant() {     
       axios        
-      .post("http://localhost:3000/bhm/retrieveAllOccupants", { token: "sd" })        
+      .post("http://localhost:3000/bhm/retrieveAllOccupants", { token:this.$store.state.token})        
       .then(response => {          
-        console.log(response);          
-        this.occupant = response.data.data;        
+                 
+        this.occupant = response.data.data;      
       })        
       .catch(error => {          
         console.log(error);        
@@ -272,16 +275,13 @@ export default {
       this.dialog = false;
     },
     save() {
-      if (this.$refs.form.validate()) {
-        this.snackbar = true;
-        this.axios
-        .post('http://localhost:3000/bhm/createOccupant')
-        .then(response =>{
-          this.occupant.push(response.data.data)
-        })
+      if (this.$refs.form.validate()) { 
+        
         if (this.editedIndex > -1) {
+          console.log("edited account")
           Object.assign(this.occupant[this.editedIndex], this.editedItem);
         } else {
+           console.log("add account")
           this.occupant.push(this.editedItem);
         }
         for (let key in this.editedItem) {
@@ -293,13 +293,7 @@ export default {
         this.close();
       }
     }
-  },
-  mounted() { 
-    if(localStorage.token!="null"){
-     this.occupant = this.populateOccupant();  
-    }else{
-      this.$router.push({path:"/"});
-    }   
   }
+ 
 };
 </script>
