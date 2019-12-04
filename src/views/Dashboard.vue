@@ -27,36 +27,60 @@
                 <template v-slot:activator="{ on }">
                   <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
                 </template>
-                <v-card>
-                  <v-card-title>
-                    <span class="headline">{{ formTitle }}</span>
-                  </v-card-title>
-
-                  <v-card-text>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12" sm="6" md="4">
-                          <v-text-field v-model="editedItem.roomFloor" label="Room Floor"></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6" md="4">
-                          <v-text-field v-model="editedItem.roomName" label="Room Name"></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6" md="4">
-                          <v-text-field v-model="editedItem.roomCapacity" label="Room Capacity"></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6" md="4">
-                          <v-text-field v-model="editedItem.rentPrice" label="Rent Price"></v-text-field>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-card-text>
-
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
-                    <v-btn class="ma-2" outlined color="success" @click="save">Save</v-btn>
-                  </v-card-actions>
-                </v-card>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">{{ formTitle }}</span>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container>
+                        <v-row>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.roomFloor"
+                              label="Room Floor"
+                              :rules="floorRules"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.roomName"
+                              label="Room Name"
+                              :rules="nameRules"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.roomCapacity"
+                              label="Room Capacity"
+                              :rules="capacityRules"
+                              type="number"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.rentPrice"
+                              label="Rent Price"
+                              :rules="priceRules"
+                              type="number"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
+                      <v-btn
+                        class="ma-2"
+                        outlined
+                        color="success"
+                        @click="save"
+                        :disabled="!valid"
+                      >Save</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-form>
               </v-dialog>
             </v-toolbar>
           </template>
@@ -72,47 +96,54 @@
     </v-row>
     <!-- confirmation Modal -->
     <v-dialog v-model="confirm" max-width="500px" id="confirm">
-      <v-card><center>
-            <img src="~@/assets/del.gif" id="delImg">
-          </center>
+      <v-card>
+        <center>
+          <img src="~@/assets/del.gif" id="delImg" />
+        </center>
         <v-card-title>
           <span class="headline">Are you sure you want to delete?</span>
         </v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <br>
+          <br />
           <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
           <v-btn class="ma-2" outlined color="success" @click="deleteItem(currentId)">Yes</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- end -->
-    <v-dialog v-model="success" max-width="500px" id="confirm">
-      <v-card>
-        <v-card-title>
-          <center>
-            <img src="~@/assets/suc.gif" id="successImg">
-          </center>
-          <br>
-          <h2 class="headline">Room has been added successfully!!</h2>
-          <br>
-          <v-spacer></v-spacer><br><br>
-          <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn><br>
-          <v-spacer></v-spacer>
-        </v-card-title>
-      </v-card>
-    </v-dialog>
+        <v-dialog v-model="success" max-width="500px" id="confirm">
+          <v-card>
+            <v-card-title>
+              <center>
+                <img src="~@/assets/suc.gif" id="successImg" />
+              </center>
+              <br />
+              <h2 class="headline">Room has been added successfully!!</h2>
+              <br />
+              <v-spacer></v-spacer>
+              <br />
+              <br />
+              <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn>
+              <br />
+              <v-spacer></v-spacer>
+            </v-card-title>
+          </v-card>
+        </v-dialog>
     <v-dialog v-model="updated" max-width="500px" id="confirm">
       <v-card>
         <v-card-title>
           <center>
-            <img src="~@/assets/suc.gif" id="successImg">
+            <img src="~@/assets/suc.gif" id="successImg" />
           </center>
-          <br>
+          <br />
           <h2 class="headline">Room has been updated successfully!!</h2>
-          <br>
-          <v-spacer></v-spacer><br><br>
-          <v-btn class="btnClose" outlined color="success" @click="cloeseupdate()">C L O S E</v-btn><br>
+          <br />
+          <v-spacer></v-spacer>
+          <br />
+          <br />
+          <v-btn class="btnClose" outlined color="success" @click="cloeseupdate()">C L O S E</v-btn>
+          <br />
           <v-spacer></v-spacer>
         </v-card-title>
       </v-card>
@@ -135,16 +166,15 @@
   height: 150px;
   width: auto;
 }
-.btnClose{
-  margin-left: 170px!important;
+.btnClose {
+  margin-left: 170px !important;
 }
 #confirm {
-  margin-top: 100px!important;
+  margin-top: 100px !important;
   text-align: center;
 }
-.headline{
-  margin-left: 35px!important;
-
+.headline {
+  margin-left: 35px !important;
 }
 </style>
 <script>
@@ -179,10 +209,15 @@ export default {
     search: "",
     confirm: false,
     success: false,
-    updated:false,
+    updated: false,
+    valid: true,
     dialog: false,
     currentId: null,
     dialog: false,
+    floorRules: [v => !!v || "Room Floor is required"],
+    nameRules: [v => !!v || "Name is required"],
+    capacityRules: [v => !!v || "Capacity is required"],
+    priceRules: [v => !!v || "Price is required"],
     headers: [
       {
         text: "Room Floor",
@@ -198,10 +233,10 @@ export default {
     editedIndex: -1,
     editedItem: {
       number: "",
-      roomFloor: 1,
+      roomFloor: "",
       roomName: "",
-      roomCapacity: 0,
-      rentPrice: 0
+      roomCapacity: "",
+      rentPrice: ""
     }
   }),
   computed: {
@@ -236,8 +271,8 @@ export default {
     showSuccess() {
       this.success = true;
     },
-    showupdated(){
-      this.updated = true
+    showupdated() {
+      this.updated = true;
     },
     deleteItem(id) {
       const index = this.room.indexOf(id);
@@ -247,7 +282,7 @@ export default {
         })
         .then(response => {
           console.log(response);
-          this.room.splice(index -1, 1);
+          this.room.splice(index - 1, 1);
         })
         .catch(error => {
           console.log(error);
@@ -257,10 +292,11 @@ export default {
     closesuccess() {
       this.success = false;
     },
-    cloeseupdate(){
-      this.updated = false
+    cloeseupdate() {
+      this.updated = false;
     },
     close() {
+      this.$refs.form.resetValidation();
       this.dialog = false;
       this.confirm = false;
       setTimeout(() => {
@@ -285,12 +321,13 @@ export default {
           )
           .then(response => {
             console.log(response);
-            this.showupdated()
+            this.showupdated();
           })
           .catch(error => {
             console.log(error);
           });
-      } else {
+      } else if (this.$refs.form.validate()) {
+        this.snackbar = true;
         this.room.push(this.editedItem);
         axios
           .post("http://localhost:3000/bhm/createRoom", {
@@ -305,6 +342,7 @@ export default {
             console.log(error);
           });
       }
+      this.$refs.form.resetValidation();
       this.close();
     }
   }

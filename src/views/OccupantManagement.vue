@@ -28,23 +28,27 @@
                     <v-card-text>
                       <v-container>
                         <v-text-field
-                          v-model="editedItem.roomFloor"
+                          v-model="editedItem.room_floor"
                           label="Room Floor"
                           :rules="nameRules"
                         ></v-text-field>
                         <v-text-field
-                          v-model="editedItem.roomName"
+                          v-model="editedItem.room_name"
                           label="Room Name"
                           :rules="nameRules"
                         ></v-text-field>
                         <v-text-field
-                          v-model="editedItem.roomOccupant"
+                          v-model="editedItem.occupant_name"
                           label="Name"
                           :rules="nameRules"
                         ></v-text-field>
-                        <v-text-field v-model="editedItem.email" label="Email" :rules="emailRules"></v-text-field>
                         <v-text-field
-                          v-model="editedItem.contact"
+                          v-model="editedItem.occupant_email"
+                          label="Email"
+                          :rules="emailRules"
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="editedItem.occupant_contact"
                           label="Contact"
                           :rules="nameRules"
                         ></v-text-field>
@@ -68,18 +72,18 @@
             </v-toolbar>
           </template>
           <template v-slot:item.action="{ item }">
-            <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
             <v-btn
               class="text"
               outlined
               color="primary"
               @click="payment = true,editedPayment(item)"
             >PAYMENT DETAILS</v-btn>
-            <v-btn class="text" outlined color="error" @click="openDialog(item.number)">DELETE</v-btn>
+            <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
+            <v-btn class="text" outlined color="error" @click="openDialog(item._id)">DELETE</v-btn>
           </template>
         </v-data-table>
         <!-- PAYMENT HISTORY -->
-        <v-dialog v-model="payment" max-width="800px">
+        <!-- <v-dialog v-model="payment" max-width="800px">
           <v-data-table
             :headers="paymentHeaders"
             :items="occupant"
@@ -129,26 +133,62 @@
               <v-btn class="text" outlined color="success" @click="editPayment(item)">EDIT PAYMENT</v-btn>
             </template>
           </v-data-table>
-        </v-dialog>
+        </v-dialog>-->
         <!-- END -->
         <!-- confirmation Modal -->
         <v-dialog v-model="confirm" max-width="500px" id="confirm">
           <v-card>
             <center>
-              <img src="~@/assets/del.gif" id="delImg">
+              <img src="~@/assets/del.gif" id="delImg" />
             </center>
             <v-card-title>
               <span class="headline">Are you sure you want to delete?</span>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <br>
+              <br />
               <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
               <v-btn class="ma-2" outlined color="success" @click="deleteItem(currentId)">Yes</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
         <!-- end -->
+        <v-dialog v-model="success" max-width="500px" id="confirm">
+          <v-card>
+            <v-card-title>
+              <center>
+                <img src="~@/assets/suc.gif" id="successImg" />
+              </center>
+              <br />
+              <h2 class="headline">Room has been added successfully!!</h2>
+              <br />
+              <v-spacer></v-spacer>
+              <br />
+              <br />
+              <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn>
+              <br />
+              <v-spacer></v-spacer>
+            </v-card-title>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="updated" max-width="500px" id="confirm">
+          <v-card>
+            <v-card-title>
+              <center>
+                <img src="~@/assets/suc.gif" id="successImg" />
+              </center>
+              <br />
+              <h2 class="headline">Room has been updated successfully!!</h2>
+              <br />
+              <v-spacer></v-spacer>
+              <br />
+              <br />
+              <v-btn class="btnClose" outlined color="success" @click="cloeseupdate()">C L O S E</v-btn>
+              <br />
+              <v-spacer></v-spacer>
+            </v-card-title>
+          </v-card>
+        </v-dialog>
       </v-col>
     </v-row>
   </div>
@@ -163,11 +203,58 @@
   font-size: 10px !important;
   margin-left: 10px;
 }
+#successImg {
+  margin-left: 150px;
+  height: 150px;
+  width: auto;
+}
+#delImg {
+  margin-left: 25px;
+  height: 150px;
+  width: auto;
+}
+.btnClose {
+  margin-left: 170px !important;
+}
+#confirm {
+  margin-top: 100px !important;
+  text-align: center;
+}
+.headline {
+  margin-left: 35px !important;
+}
 </style>
 <script>
 import axios from "axios";
+function populateOccupant() {
+  var room = [];
+  axios
+    .post("http://localhost:3000/bhm/retrieveAllOccupants", {
+      token: localStorage.token
+    })
+    .then(response => {
+      console.log(response);
+      var datax = response.data.data;
+      var counter = 0;
+      for (counter; counter < datax.length; counter++) {
+        room.push({
+          _id: datax[counter]._id,
+          room_floor: datax[counter].room_floor,
+          room_name: datax[counter].room_name,
+          occupant_name: datax[counter].occupant_name,
+          occupant_email: datax[counter].occupant_email,
+          occupant_contact: datax[counter].occupant_contact
+        });
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  return room;
+}
 export default {
   data: () => ({
+    updated:false,
     confirm: false,
     success: false,
     currentId: null,
@@ -188,14 +275,16 @@ export default {
         align: "left",
         value: "room_floor"
       },
-      { text: "Room Name", value: "room_name", sortable: false },
-      { text: "Occupant", value: "occupant_name", sortable: false },
+      { text: "Room Name", value: "room_name" },
+      { text: "Occupant", value: "occupant_name" },
+      { text: "Email", value: "occupant_email", sortable: false },
+      { text: "Contact #", value: "occupant_contact", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
     occupant: [],
     editedIndex: -1,
     editedItem: {
-      number:'',
+      _id: "",
       room_floor: "",
       room_name: "",
       occupant_name: "",
@@ -203,7 +292,7 @@ export default {
       occupant_contact: ""
     },
     defaultItem: {
-      number:'',
+      _id: "",
       room_floor: "",
       room_name: "",
       occupant_name: "",
@@ -226,17 +315,6 @@ export default {
   },
 
   methods: {
-    populateOccupant() {
-      axios
-        .post("http://localhost:3000/bhm/retrieveAllOccupants", { token: "sd" })
-        .then(response => {
-          console.log(response);
-          this.occupant = response.data.data;
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
     openDialog(id) {
       (this.confirm = true), (this.currentId = id);
     },
@@ -250,16 +328,21 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
+     showSuccess() {
+      this.success = true;
+    },
+    showupdated() {
+      this.updated = true;
+    },
     deleteItem(id) {
-      alert(id)
       const index = this.occupant.indexOf(id);
       axios
-        .post("http://localhost:3000/bhm/deleteRoomByID/" + id, {
+        .post("http://localhost:3000/bhm/deleteOccupantByID/" + id, {
           token: localStorage.token
         })
         .then(response => {
           console.log(response);
-          this.occupant.splice(index - 1, 1);
+          this.occupant.splice(index -1, 1);
         })
         .catch(error => {
           console.log(error);
@@ -269,44 +352,62 @@ export default {
     closePaymentModal() {
       this.modalPayment = false;
     },
+    closesuccess() {
+      this.success = false;
+    },
+    cloeseupdate() {
+      this.updated = false;
+    },
     close() {
+      this.updated = false;
+      this.confirm = false;
       this.$refs.form.resetValidation();
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       }, 300);
-      for (let key in this.editedItem) {
-        if (this.editedItem.hasOwnProperty(key)) {
-          this.editedItem[key] = "";
-        }
-      }
       this.dialog = false;
     },
     save() {
-      if (this.$refs.form.validate()) {
+      if (this.editedIndex > -1) {
+        Object.assign(this.occupant[this.editedIndex], this.editedItem);
+        axios
+          .post(
+            "http://localhost:3000/bhm/updateOccupant/" + this.editedItem._id,
+            {
+              _id: this.editedItem._id,
+              room_name: this.editedItem.room_name,
+              room_floor: this.editedItem.room_floor,
+              occupant_name: this.editedItem.occupant_name,
+              occupant_email: this.editedItem.occupant_email,
+              occupant_contact: this.editedItem.occupant_contact,
+              token: localStorage.token
+            }
+          )
+          .then(response => {
+            console.log(response);
+            this.showupdated();
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else if (this.$refs.form.validate()) {
         this.snackbar = true;
+        this.occupant.push(this.editedItem);
         axios
           .post("http://localhost:3000/bhm/createOccupant", {
-            room_name: this.editedItem.roomName,
-            room_floor: this.editedItem.roomFloor,
-            occupant_name: this.editedItem.roomOccupant,
-            occupant_email: this.editedItem.email,
-            occupant_contact: this.editedItem.contact,
+            room_name: this.editedItem.room_name,
+            room_floor: this.editedItem.room_floor,
+            occupant_name: this.editedItem.occupant_name,
+            occupant_email: this.editedItem.occupant_email,
+            occupant_contact: this.editedItem.occupant_contact,
             token: localStorage.token
           })
           .then(response => {
             console.log(response);
-            this.occupant = this.populateOccupant();
+            this.occupant = populateOccupant();
+            this.showSuccess()
           });
-      } else if (this.editedIndex > -1) {
-        Object.assign(this.occupant[this.editedIndex], this.editedItem);
-      } else {
-        this.occupant.push(this.editedItem);
-      }
-      for (let key in this.editedItem) {
-        if (this.editedItem.hasOwnProperty(key)) {
-          this.editedItem[key] = "";
-        }
       }
       this.$refs.form.resetValidation();
       this.close();
@@ -314,7 +415,7 @@ export default {
   },
   mounted() {
     if (localStorage.token != "null") {
-      this.occupant = this.populateOccupant();
+      this.occupant = populateOccupant();
     } else {
       this.$router.push({ path: "/" });
     }

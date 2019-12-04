@@ -1,92 +1,118 @@
 <template>
-  <div id="margin">
-    <v-card>
-      <v-tabs horizontal>
-        <v-tab class="padding">
-          <v-icon left>mdi-account</v-icon>Profile Setting
-        </v-tab>
-        <v-tab-item>
-          <v-card>
-            <v-card-text class="space">
-              <v-form class="size">
-                <v-toolbar-title>Username</v-toolbar-title>
-                <br />
-                <v-text-field
-                  label="Current username"
-                  prepend-icon="mdi-account"
-                  outlined
-                  v-model="username"
-                ></v-text-field>
-        
-                <br />
-               
-                <v-toolbar-title>Password</v-toolbar-title>
-                <br />
-                <v-text-field
-                  label="Current password"
-                  prepend-icon="mdi-lock"
-                  outlined
-                  v-model="currentPassword"
-                ></v-text-field>
-                <v-text-field
-                  label="New password"
-                  prepend-icon="mdi-account-lock"
-                  outlined
-                  v-model="newPassword"
-                ></v-text-field>
-                <v-text-field
-                  label="Confirm password"
-                  prepend-icon="mdi-lock"
-                  outlined
-                  v-model="confirmPassword"
-                ></v-text-field>
-                <center>
-                  <v-btn class="ma-2" outlined color="success" @click="save()"> Save Changes</v-btn>
-                </center>
-              </v-form>
-            </v-card-text>
-          </v-card>
-        </v-tab-item>
-      </v-tabs>
+  <div id="top">
+    <v-card class="mb-4">
     </v-card>
+    <v-stepper v-model="e1">
+      <v-stepper-header>
+        <template v-for="n in steps">
+          <v-stepper-step
+            :key="`${n}-step`"
+            :complete="e1 > n"
+            :step="n"
+            editable
+          >
+            Step {{ n }}
+          </v-stepper-step>
+
+          <v-divider
+            v-if="n !== steps"
+            :key="n"
+          ></v-divider>
+        </template>
+      </v-stepper-header>
+
+      <v-stepper-items>
+        <v-stepper-content
+          v-for="n in steps"
+          :key="`${n}-content`"
+          :step="n"
+        >
+          <v-card
+            class="mb-12"
+            color="grey lighten-1"
+            height="200px"
+          ></v-card>
+
+          <v-btn
+            color="primary"
+            @click="nextStep(n)"
+          >
+            Continue
+          </v-btn>
+
+          <v-btn text>Cancel</v-btn>
+        </v-stepper-content>
+      </v-stepper-items>
+    </v-stepper>
   </div>
 </template>
+<style scoped>
+  #top{
+    margin-top:10px!important;
+    max-width: 400px!important;
+  }
+</style>
 <script>
-import axios from 'axios'
+import axios from "axios";
 export default {
   name: "settings",
   data() {
     return {
-     
+      e1: 1,
+        steps: 2,
       username: "",
-      newUsername:"",
-      currentPassword:"",
-      newPassword:"",
-      confirmPassword:""
+      newUsername: "",
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+      show1: false,
+      rules: {
+        required: value => !!value || "Required.",
+        nameRules: v => /^[A-Z a-z]+$/.test(v) || "Name must be valid",
+        matchPassword: () =>
+          this.credentials.password === this.confirm_password ||
+          "Passwords don't match !"
+      },
+       watch: {
+      steps (val) {
+        if (this.e1 > val) {
+          this.e1 = val
+        }
+      },
+    },
     };
+    
   },
-  methods:{
-    save(){
-      if(this.newPassword === this.confirmPassword){
+  methods: {
+    nextStep (n) {
+        if (n === this.steps) {
+          this.e1 = 1
+        } else {
+          this.e1 = n + 1
+        }
+      },
+    save() {
+      if (this.newPassword === this.confirmPassword) {
         axios
-          .post("http://localhost:3000/bhm/update", {username:this.username,oldPassword:this.currentPassword,newPassword:this.newPassword})
+          .post("http://localhost:3000/bhm/update", {
+            username: this.username,
+            oldPassword: this.currentPassword,
+            newPassword: this.newPassword
+          })
           .then(response => {
             console.log(response);
-            
           })
           .catch(error => {
             console.log(error);
           });
       }
-      
     }
-
   }
 };
 </script>
 <style>
-template{
-  text-align: center
+template {
+  text-align: center;
 }
 #margin {
   margin: auto;
