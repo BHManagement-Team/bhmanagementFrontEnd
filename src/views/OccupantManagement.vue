@@ -75,10 +75,7 @@
               color="primary"
               @click="payment = true,editedPayment(item)"
             >PAYMENT DETAILS</v-btn>
-            <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
-          </template>
-          <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+            <v-btn class="text" outlined color="error" @click="openDialog(item.number)">DELETE</v-btn>
           </template>
         </v-data-table>
         <!-- PAYMENT HISTORY -->
@@ -131,12 +128,27 @@
             <template v-slot:item.action="{ item }">
               <v-btn class="text" outlined color="success" @click="editPayment(item)">EDIT PAYMENT</v-btn>
             </template>
-            <template v-slot:no-data>
-              <v-btn color="primary" @click="initialize">Reset</v-btn>
-            </template>
           </v-data-table>
         </v-dialog>
         <!-- END -->
+        <!-- confirmation Modal -->
+        <v-dialog v-model="confirm" max-width="500px" id="confirm">
+          <v-card>
+            <center>
+              <img src="~@/assets/del.gif" id="delImg">
+            </center>
+            <v-card-title>
+              <span class="headline">Are you sure you want to delete?</span>
+            </v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <br>
+              <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
+              <v-btn class="ma-2" outlined color="success" @click="deleteItem(currentId)">Yes</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <!-- end -->
       </v-col>
     </v-row>
   </div>
@@ -156,6 +168,9 @@
 import axios from "axios";
 export default {
   data: () => ({
+    confirm: false,
+    success: false,
+    currentId: null,
     valid: true,
     name: "",
     nameRules: [v => !!v || "Name is required"],
@@ -167,51 +182,33 @@ export default {
     modalPayment: false,
     payment: false,
     dialog: false,
-    occupant:[],
-    //payment section
-    paymentHeaders: [
-      {
-        text: "Payment Date",
-        align: "Amount",
-        value: "paymentDate"
-      },
-      { text: "Amount", value: "paymentAmount", sortable: false },
-      { text: "Actions", value: "action", sortable: false }
-    ],
-    editedIndex: -1,
-    editedPayment: {
-      paymentDate: 0,
-      paymentAmount: 0
-    },
-    defaultPayment: {
-      paymentDate: 0,
-      paymentAmount: 0
-    },
-    //end payment section
     headers: [
       {
         text: "Room Floor",
         align: "left",
-        value: "room_nloor"
+        value: "room_floor"
       },
       { text: "Room Name", value: "room_name", sortable: false },
       { text: "Occupant", value: "occupant_name", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
+    occupant: [],
     editedIndex: -1,
     editedItem: {
-      roomFloor: "",
-      roomName: "",
-      roomOccupant: "",
-      email: "",
-      contact: ""
+      number:'',
+      room_floor: "",
+      room_name: "",
+      occupant_name: "",
+      occupant_email: "",
+      occupant_contact: ""
     },
     defaultItem: {
-      roomFloor: "",
-      roomName: "",
-      roomOccupant: "",
-      email: "",
-      contact: ""
+      number:'',
+      room_floor: "",
+      room_name: "",
+      occupant_name: "",
+      occupant_email: "",
+      occupant_contact: ""
     }
   }),
   computed: {
@@ -227,20 +224,22 @@ export default {
       val || this.close();
     }
   },
-  
-  methods: {
-    populateOccupant() {      
-      axios        
-      .post("http://localhost:3000/bhm/retrieveAllOccupants", { token: "sd" })        
-      .then(response => {          
-        console.log(response);          
-        this.occupant = response.data.data;        
-      })        
-      .catch(error => {          
-        console.log(error);        
-        });    
-      },
 
+  methods: {
+    populateOccupant() {
+      axios
+        .post("http://localhost:3000/bhm/retrieveAllOccupants", { token: "sd" })
+        .then(response => {
+          console.log(response);
+          this.occupant = response.data.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    openDialog(id) {
+      (this.confirm = true), (this.currentId = id);
+    },
     editPayment(item) {
       this.editedIndex = this.occupant.indexOf(item);
       this.editedPayment = Object.assign({}, item);
@@ -251,10 +250,21 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
-    deleteItem(item) {
-      const index = this.occupant.indexOf(item);
-      confirm("Are you sure you want to delete this?") &&
-        this.occupant.splice(index, 1);
+    deleteItem(id) {
+      alert(id)
+      const index = this.occupant.indexOf(id);
+      axios
+        .post("http://localhost:3000/bhm/deleteRoomByID/" + id, {
+          token: localStorage.token
+        })
+        .then(response => {
+          console.log(response);
+          this.occupant.splice(index - 1, 1);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      this.confirm = false;
     },
     closePaymentModal() {
       this.modalPayment = false;
@@ -275,32 +285,39 @@ export default {
     save() {
       if (this.$refs.form.validate()) {
         this.snackbar = true;
-        this.axios
-        .post('http://localhost:3000/bhm/createOccupant')
-        .then(response =>{
-          this.occupant.push(response.data.data)
-        })
-        if (this.editedIndex > -1) {
-          Object.assign(this.occupant[this.editedIndex], this.editedItem);
-        } else {
-          this.occupant.push(this.editedItem);
-        }
-        for (let key in this.editedItem) {
-          if (this.editedItem.hasOwnProperty(key)) {
-            this.editedItem[key] = "";
-          }
-        }
-        this.$refs.form.resetValidation();
-        this.close();
+        axios
+          .post("http://localhost:3000/bhm/createOccupant", {
+            room_name: this.editedItem.roomName,
+            room_floor: this.editedItem.roomFloor,
+            occupant_name: this.editedItem.roomOccupant,
+            occupant_email: this.editedItem.email,
+            occupant_contact: this.editedItem.contact,
+            token: localStorage.token
+          })
+          .then(response => {
+            console.log(response);
+            this.occupant = this.populateOccupant();
+          });
+      } else if (this.editedIndex > -1) {
+        Object.assign(this.occupant[this.editedIndex], this.editedItem);
+      } else {
+        this.occupant.push(this.editedItem);
       }
+      for (let key in this.editedItem) {
+        if (this.editedItem.hasOwnProperty(key)) {
+          this.editedItem[key] = "";
+        }
+      }
+      this.$refs.form.resetValidation();
+      this.close();
     }
   },
-  mounted() { 
-    if(localStorage.token!="null"){
-     this.occupant = this.populateOccupant();  
-    }else{
-      this.$router.push({path:"/"});
-    }   
+  mounted() {
+    if (localStorage.token != "null") {
+      this.occupant = this.populateOccupant();
+    } else {
+      this.$router.push({ path: "/" });
+    }
   }
 };
 </script>

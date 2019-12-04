@@ -30,12 +30,7 @@
                     ></v-text-field>
                   </v-form>
                 </v-card-text>
-                <center
-                  prepend-icon="mdi-lock"
-                  v-bind:style="{ color: color }"
-                  id="warnMessage"
-                >{{warning}}</center>
-
+                <center v-bind:style="{ color: color }" id="warnMessage">{{warning}}</center>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <!-- <router-link class="btnLogin" :to="'/toDashboard'"> -->
@@ -60,7 +55,7 @@ export default {
   name: "Login",
   data() {
     return {
-      warning: "",
+      warning: ".",
       username: "",
       password: "",
       color: "white"
@@ -85,7 +80,7 @@ export default {
       console.log("i made it: " + JSON.stringify(res.data.message));
       this.warning = JSON.stringify(res.data.message);
     }
-  },  
+  },
   props: {}
 };
 </script>
@@ -104,5 +99,8 @@ img {
     url("https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940");
   background-size: cover;
   transform: scale(1.1);
+}
+#warnMessage {
+  color: red;
 }
 </style>
