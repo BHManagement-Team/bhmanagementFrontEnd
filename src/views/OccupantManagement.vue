@@ -8,11 +8,19 @@
           sort-by="roomName"
           class="elevation-1"
           id="styleMargins"
+          :search="search"
         >
           <template v-slot:top>
             <v-toolbar flat color="white">
               <v-toolbar-title>Occupant Management</v-toolbar-title>
               <v-divider class="mx-4" inset vertical></v-divider>
+              <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="Search"
+                single-line
+                hide-details
+              ></v-text-field>
               <v-spacer></v-spacer>
 
               <v-dialog v-model="dialog" max-width="500px">
@@ -77,7 +85,7 @@
               outlined
               color="primary"
               @click="paymentDetail(item)"
-            >PAYMENT DETAILS</v-btn><br>
+            >PAYMENT DETAILS</v-btn>
             <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
             <v-btn class="text" outlined color="error" @click="openDialog(item._id) ">DELETE</v-btn>
           </template>
@@ -160,14 +168,14 @@
         <v-dialog v-model="confirm" max-width="500px" id="confirm">
           <v-card>
             <center>
-              <img src="~@/assets/del.gif" id="delImg">
+              <img src="~@/assets/del.gif" id="delImg" />
             </center>
             <v-card-title>
               <span class="headline">Are you sure you want to delete?</span>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <br>
+              <br />
               <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
               <v-btn class="ma-2" outlined color="success" @click="deleteItem(currentId)">Yes</v-btn>
             </v-card-actions>
@@ -178,16 +186,16 @@
           <v-card>
             <v-card-title>
               <center>
-                <img src="~@/assets/suc.gif" id="successImg">
+                <img src="~@/assets/suc.gif" id="successImg" />
               </center>
-              <br>
+              <br />
               <h2 class="headline">Room has been added successfully!!</h2>
-              <br>
+              <br />
               <v-spacer></v-spacer>
-              <br>
-              <br>
+              <br />
+              <br />
               <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn>
-              <br>
+              <br />
               <v-spacer></v-spacer>
             </v-card-title>
           </v-card>
@@ -196,16 +204,34 @@
           <v-card>
             <v-card-title>
               <center>
-                <img src="~@/assets/suc.gif" id="successImg">
+                <img src="~@/assets/suc.gif" id="successImg" />
               </center>
-              <br>
+              <br />
               <h2 class="headline">Room has been updated successfully!!</h2>
-              <br>
+              <br />
               <v-spacer></v-spacer>
-              <br>
-              <br>
+              <br />
+              <br />
               <v-btn class="btnClose" outlined color="success" @click="cloeseupdate()">C L O S E</v-btn>
-              <br>
+              <br />
+              <v-spacer></v-spacer>
+            </v-card-title>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="deleteconfirm" max-width="500px" id="confirm">
+          <v-card>
+            <v-card-title>
+              <center>
+                <img src="~@/assets/suc.gif" id="successImg" />
+              </center>
+              <br />
+              <h2 class="headline">Room has been deleted successfully!!</h2>
+              <br />
+              <v-spacer></v-spacer>
+              <br />
+              <br />
+              <v-btn class="btnClose" outlined color="success" @click="closedelete()">C L O S E</v-btn>
+              <br />
               <v-spacer></v-spacer>
             </v-card-title>
           </v-card>
@@ -247,11 +273,11 @@
 .headline {
   margin-left: 35px !important;
 }
-#body{
+#body {
   background-color: rgb(224, 224, 224);
-  height: 100%  ;
+  height: 100%;
 }
-v-btn{
+v-btn {
   max-width: 20px;
 }
 </style>
@@ -285,11 +311,13 @@ function populateOccupant() {
 }
 export default {
   data: () => ({
+    search: "",
+    deleteconfirm: false,
     updated: false,
     confirm: false,
     success: false,
     currentId: null,
-    paymentEdit : false,
+    paymentEdit: false,
     valid: true,
     name: "",
     nameRules: [v => !!v || "Name is required"],
@@ -332,8 +360,6 @@ export default {
       },
       { text: "Room Name", value: "room_name" },
       { text: "Occupant", value: "occupant_name" },
-      { text: "Email", value: "occupant_email", sortable: false },
-      { text: "Contact #", value: "occupant_contact", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
     occupant: [],
@@ -393,6 +419,9 @@ export default {
     showupdated() {
       this.updated = true;
     },
+    showDeleted() {
+      this.deleteconfirm = true;
+    },
     deleteItem(id) {
       const index = this.occupant.indexOf(id);
       axios
@@ -401,14 +430,15 @@ export default {
         })
         .then(response => {
           console.log(response);
-          this.occupant.splice(index -1, 1);
+          this.occupant.splice(index - 1, 1);
+          this.showDeleted();
         })
         .catch(error => {
           console.log(error);
         });
       this.confirm = false;
     },
-    //for editing payment clicking 
+    //for editing payment clicking
     editPayment(item) {
       console.log(item.billing_date);
       this.temporary = item;
@@ -421,8 +451,11 @@ export default {
     cloeseupdate() {
       this.updated = false;
     },
-    closeModal(){
-      paymentEdit = false
+    closeModal() {
+      paymentEdit = false;
+    },
+    closedelete(){
+      this.deleteconfirm= false
     },
     close() {
       this.updated = false;
@@ -473,7 +506,7 @@ export default {
               occupant_contact: this.editedItem.occupant_contact
             })
             .then(response => {
-              this.occupant= populateOccupant();
+              this.occupant = populateOccupant();
               this.showSuccess();
               console.log(response);
             })
@@ -486,7 +519,7 @@ export default {
       }
     },
     //for payment details
-    paymentDetail(item) {     
+    paymentDetail(item) {
       this.editedItem = Object.assign({}, item);
       axios
         .post(
@@ -496,25 +529,25 @@ export default {
         )
         .then(response => {
           this.paymentHistory = response.data.data.reverse();
-
           this.modalPayment = false;
         })
         .catch(error => {
           console.log(error);
         });
-
       this.payment = true;
     },
     //saving for payment
     closePaymentModal() {
       if (this.editedIndex > -1) {
-        console.log(this.temporary)
+        console.log(this.temporary);
         axios
-          .post("http://localhost:3000/bhm/updateOnePayment/"+this.temporary._id, {
-            token: this.$store.state.token,
-            amount: this.editedPayment.paymentAmount
-          
-          })
+          .post(
+            "http://localhost:3000/bhm/updateOnePayment/" + this.temporary._id,
+            {
+              token: this.$store.state.token,
+              amount: this.editedPayment.paymentAmount
+            }
+          )
           .then(response => {
             console.log(response);
             this.temporary1 = this.temporary;

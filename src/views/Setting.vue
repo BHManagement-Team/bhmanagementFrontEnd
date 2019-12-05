@@ -5,13 +5,12 @@
       <v-form id="form">
         <center>
           <img src="~@/assets/bhmLogo.png">
-          <h3>Password Settings</h3>
         </center>
         <v-text-field
           v-model="username"
           label="New Username"
           name="current_username"
-          prepend-icon="mdi-lock"
+          prepend-icon="mdi-account"
           type="text"
         ></v-text-field>
         <v-text-field
@@ -23,14 +22,14 @@
         <v-text-field
           v-model="newPassword"
           label="New Password"
-          prepend-icon="mdi-lock"
+          prepend-icon="mdi-account-lock"
           type="password"
         ></v-text-field>
         <v-text-field
           v-model="confirmPassword"
           :rules="[rules.matchPassword]"
           label="Confirm New Password"
-          prepend-icon="mdi-lock"
+          prepend-icon="mdi-account-lock"
           type="password"
         ></v-text-field>
       </v-form>
@@ -50,13 +49,13 @@
   position: absolute;
   top: 130px !important;
   left: 300px !important;
-  width: 550px !important;
+  width: 930px !important;
 }
 #form {
   padding: 20px;
 }
 #btnSave {
-  margin-left: 180px;
+  margin-left: 380px;
   margin-bottom: 20px;
 }
 #body{
@@ -132,7 +131,7 @@ export default {
   }
 };
 </script>
-<style>
+<!-- <style>
 #body{
   background-color: rgb(224, 224, 224);
   height: 100%  ;
@@ -154,4 +153,7 @@ template {
   font-size: 5px !important;
   padding: 25px;
 }
-</style>
+#top{
+  max-width:1000px!important;
+}
+</style> -->

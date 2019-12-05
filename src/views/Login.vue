@@ -61,7 +61,7 @@ export default {
   data() {
     return {
       snackbar: false,
-      text: 'Incorrect username of password!',
+      text: 'Incorrect username or password!',
       warning: ".",
       username: "",
       password: "",
@@ -100,7 +100,7 @@ img {
 }
 .bg {
   width: 100%;
-  height: 100%;
+  height: 96%;
   position: absolute;
   top: 0;
   left: 0;

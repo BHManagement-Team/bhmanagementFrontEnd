@@ -26,7 +26,7 @@
 
               <v-dialog v-model="dialog" max-width="500px">
                 <template v-slot:activator="{ on }">
-                  <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
+                  <v-btn color="primary" dark class="mb-2" v-on="on">Add Room</v-btn>
                 </template>
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-card>
@@ -88,9 +88,6 @@
           <template v-slot:item.action="{ item }">
             <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
             <v-icon small @click="openDialog(item.number)">mdi-delete</v-icon>
-          </template>
-          <template v-slot:no-data>
-            <v-btn color="primary">Reset</v-btn>
           </template>
         </v-data-table>
       </v-col>
@@ -206,7 +203,7 @@ import axios from "axios";
 function populateRoom() {
   var room = [];
   axios
-    .post("http://localhost:3000/bhm/retrieveAllRooms", {
+    .post("http://172.16.3.20:3000/bhm/retrieveAllRooms", {
       token: localStorage.token
     })
     .then(response => {
@@ -301,7 +298,7 @@ export default {
     deleteItem(id) {
       const index = this.room.indexOf(id);
       axios
-        .post("http://localhost:3000/bhm/deleteRoomByID/" + id, {
+        .post("http://172.16.3.20:3000/bhm/deleteRoomByID/" + id, {
           token: localStorage.token
         })
         .then(response => {
@@ -343,7 +340,7 @@ export default {
           Object.assign(this.room[this.editedIndex], this.editedItem);
           axios
             .post(
-              "http://localhost:3000/bhm/updateRoom/" + this.editedItem.number,
+              "http://172.16.3.20:3000/bhm/updateRoom/" + this.editedItem.number,
               {
                 _id: this.editedItem.number,
                 room_name: this.editedItem.roomName,
@@ -365,7 +362,7 @@ export default {
           this.snackbar = true;
           this.room.push(this.editedItem);
           axios
-            .post("http://localhost:3000/bhm/createRoom", {
+            .post("http://172.16.3.20:3000/bhm/createRoom", {
               room_name: this.editedItem.roomName,
               room_floor: this.editedItem.roomFloor,
               room_capacity: this.editedItem.roomCapacity,
