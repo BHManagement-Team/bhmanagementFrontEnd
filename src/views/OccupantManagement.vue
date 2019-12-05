@@ -51,6 +51,11 @@
                           :rules="nameRules"
                         ></v-text-field>
                         <v-text-field
+                          v-model="editedItem.occupant_gender"
+                          label="Gender"
+                          :rules="nameRules"
+                        ></v-text-field>
+                        <v-text-field
                           v-model="editedItem.occupant_email"
                           label="Email"
                           :rules="emailRules"
@@ -299,6 +304,7 @@ function populateOccupant() {
           room_floor: datax[counter].room_floor,
           room_name: datax[counter].room_name,
           occupant_name: datax[counter].occupant_name,
+          occupant_gender: datax[counter].occupant_gender,
           occupant_email: datax[counter].occupant_email,
           occupant_contact: datax[counter].occupant_contact
         });
@@ -369,6 +375,7 @@ export default {
       roomFloor: "",
       roomName: "",
       roomOccupant: "",
+      occupant_gender:"".toLowerCase(),
       email: "",
       contact: ""
     },
@@ -379,6 +386,7 @@ export default {
       room_floor: "",
       room_name: "",
       occupant_name: "",
+      occupant_gender: "".toLowerCase(),
       occupant_email: "",
       occupant_contact: ""
     }
@@ -454,8 +462,8 @@ export default {
     closeModal() {
       paymentEdit = false;
     },
-    closedelete(){
-      this.deleteconfirm= false
+    closedelete() {
+      this.deleteconfirm = false;
     },
     close() {
       this.updated = false;
@@ -480,6 +488,7 @@ export default {
                 room_name: this.editedItem.room_name,
                 room_floor: this.editedItem.room_floor,
                 occupant_name: this.editedItem.occupant_name,
+                occupant_gender: this.editedItem.occupant_gender.toLowerCase(),
                 occupant_email: this.editedItem.occupant_email,
                 occupant_contact: this.editedItem.occupant_contact,
                 token: localStorage.token
@@ -502,6 +511,7 @@ export default {
               room_name: this.editedItem.room_name,
               room_floor: this.editedItem.room_floor,
               occupant_name: this.editedItem.occupant_name,
+              occupant_gender: this.editedItem.occupant_gender.toLowerCase(),
               occupant_email: this.editedItem.occupant_email,
               occupant_contact: this.editedItem.occupant_contact
             })

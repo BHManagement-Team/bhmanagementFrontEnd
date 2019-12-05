@@ -4,9 +4,11 @@ import App from "./App.vue";
 import vuetify from '@/plugins/vuetify'
 import store from './store'
 import Axios from 'axios'
+import "chart.js";
+import "hchs-vue-charts";
 Vue.prototype.$http = Axios;
 Vue.config.productionTip = false;
-Vue.use(router, vuetify);
+Vue.use(router, vuetify, window.VueCharts);
 
 const token = localStorage.getItem('token')
 if (token) {

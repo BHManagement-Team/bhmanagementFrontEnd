@@ -37,6 +37,12 @@
       </v-list-item>
       <v-list-item link>
         <v-list-item-icon>
+          <v-icon>mdi-chart-areaspline</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title @click="goto('/analytics')">Analytics</v-list-item-title>
+      </v-list-item>
+      <v-list-item link>
+        <v-list-item-icon>
           <v-icon>mdi-exit-to-app</v-icon>
         </v-list-item-icon>
         <v-list-item-title @click="logout">LogOut</v-list-item-title>
