@@ -311,7 +311,7 @@ export default {
           .post(
             "http://localhost:3000/bhm/updateRoom/" + this.editedItem.number,
             {
-              id: this.editedItem.number,
+              _id: this.editedItem.number,
               room_name: this.editedItem.roomName,
               room_floor: this.editedItem.roomFloor,
               room_capacity: this.editedItem.roomCapacity,
@@ -337,7 +337,7 @@ export default {
             room_price: this.editedItem.rentPrice,
             token: localStorage.token
           })
-          .then((this.room = populateRoom()), this.showSuccess())
+          .then((this.room.push = populateRoom()), this.showSuccess())
           .catch(error => {
             console.log(error);
           });
