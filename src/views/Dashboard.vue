@@ -98,52 +98,70 @@
     <v-dialog v-model="confirm" max-width="500px" id="confirm">
       <v-card>
         <center>
-          <img src="~@/assets/del.gif" id="delImg" />
+          <img src="~@/assets/del.gif" id="delImg">
         </center>
         <v-card-title>
           <span class="headline">Are you sure you want to delete?</span>
         </v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <br />
+          <br>
           <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
           <v-btn class="ma-2" outlined color="success" @click="deleteItem(currentId)">Yes</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- end -->
-        <v-dialog v-model="success" max-width="500px" id="confirm">
-          <v-card>
-            <v-card-title>
-              <center>
-                <img src="~@/assets/suc.gif" id="successImg" />
-              </center>
-              <br />
-              <h2 class="headline">Room has been added successfully!!</h2>
-              <br />
-              <v-spacer></v-spacer>
-              <br />
-              <br />
-              <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn>
-              <br />
-              <v-spacer></v-spacer>
-            </v-card-title>
-          </v-card>
-        </v-dialog>
+    <v-dialog v-model="success" max-width="500px" id="confirm">
+      <v-card>
+        <v-card-title>
+          <center>
+            <img src="~@/assets/suc.gif" id="successImg">
+          </center>
+          <br>
+          <h2 class="headline">Room has been added successfully!!</h2>
+          <br>
+          <v-spacer></v-spacer>
+          <br>
+          <br>
+          <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn>
+          <br>
+          <v-spacer></v-spacer>
+        </v-card-title>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="deleteconfirm" max-width="500px" id="confirm">
+      <v-card>
+        <v-card-title>
+          <center>
+            <img src="~@/assets/suc.gif" id="successImg">
+          </center>
+          <br>
+          <h2 class="headline">Room has been deleted successfully!!</h2>
+          <br>
+          <v-spacer></v-spacer>
+          <br>
+          <br>
+          <v-btn class="btnClose" outlined color="success" @click="closedelete()">C L O S E</v-btn>
+          <br>
+          <v-spacer></v-spacer>
+        </v-card-title>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="updated" max-width="500px" id="confirm">
       <v-card>
         <v-card-title>
           <center>
-            <img src="~@/assets/suc.gif" id="successImg" />
+            <img src="~@/assets/suc.gif" id="successImg">
           </center>
-          <br />
+          <br>
           <h2 class="headline">Room has been updated successfully!!</h2>
-          <br />
+          <br>
           <v-spacer></v-spacer>
-          <br />
-          <br />
+          <br>
+          <br>
           <v-btn class="btnClose" outlined color="success" @click="cloeseupdate()">C L O S E</v-btn>
-          <br />
+          <br>
           <v-spacer></v-spacer>
         </v-card-title>
       </v-card>
@@ -207,6 +225,7 @@ function populateRoom() {
 export default {
   data: () => ({
     search: "",
+    deleteconfirm: false,
     confirm: false,
     success: false,
     updated: false,
@@ -247,7 +266,7 @@ export default {
     }
   },
   mounted() {
-      this.room=populateRoom()  
+    this.room = populateRoom();
   },
 
   watch: {
@@ -270,6 +289,9 @@ export default {
     showupdated() {
       this.updated = true;
     },
+    showDelete() {
+      this.deleteconfirm = true;
+    },
     deleteItem(id) {
       const index = this.room.indexOf(id);
       axios
@@ -279,6 +301,7 @@ export default {
         .then(response => {
           console.log(response);
           this.room.splice(index - 1, 1);
+          this.showDelete();
         })
         .catch(error => {
           console.log(error);
@@ -291,6 +314,9 @@ export default {
     cloeseupdate() {
       this.updated = false;
     },
+    closedelete() {
+      this.deleteconfirm = false;
+    },
     close() {
       this.$refs.form.resetValidation();
       this.dialog = false;
@@ -301,43 +327,52 @@ export default {
       }, 300);
     },
     save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.room[this.editedIndex], this.editedItem);
-        axios
-          .post(
-            "http://localhost:3000/bhm/updateRoom/" + this.editedItem.number,
-            {
-              _id: this.editedItem.number,
+      if (this.editedItem.roomFloor < 0) {
+        alert("Room Floor cant be below 0");
+        if (this.editedItem.roomCapacity < 0) {
+          alert("Room Capacity cant be below 0");
+        }
+      } else {
+        if (this.editedIndex > -1) {
+          Object.assign(this.room[this.editedIndex], this.editedItem);
+          axios
+            .post(
+              "http://localhost:3000/bhm/updateRoom/" + this.editedItem.number,
+              {
+                _id: this.editedItem.number,
+                room_name: this.editedItem.roomName,
+                room_floor: this.editedItem.roomFloor,
+                room_capacity: this.editedItem.roomCapacity,
+                room_price: this.editedItem.rentPrice,
+                token: localStorage.token
+              }
+            )
+            .then(response => {
+              console.log(response);
+              this.occupant.push = this.populateRoom();
+              this.showupdated();
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        } else if (this.$refs.form.validate()) {
+          this.snackbar = true;
+          this.room.push(this.editedItem);
+          axios
+            .post("http://localhost:3000/bhm/createRoom", {
               room_name: this.editedItem.roomName,
               room_floor: this.editedItem.roomFloor,
               room_capacity: this.editedItem.roomCapacity,
               room_price: this.editedItem.rentPrice,
               token: localStorage.token
-            }
-          )
-          .then(response => {
-            console.log(response);
-            this.showupdated();
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      } else if (this.$refs.form.validate()) {
-        this.snackbar = true;
-        this.room.push(this.editedItem);
-        axios
-          .post("http://localhost:3000/bhm/createRoom", {
-            room_name: this.editedItem.roomName,
-            room_floor: this.editedItem.roomFloor,
-            room_capacity: this.editedItem.roomCapacity,
-            room_price: this.editedItem.rentPrice,
-            token: localStorage.token
-          })
-          .then((this.room.push = populateRoom()), this.showSuccess())
-          .catch(error => {
-            console.log(error);
-          });
+            })
+            .then((this.room.push = populateRoom()), this.showSuccess())
+            .catch(error => {
+              console.log(error);
+            });
+        }
       }
+
       this.$refs.form.resetValidation();
       this.close();
     }

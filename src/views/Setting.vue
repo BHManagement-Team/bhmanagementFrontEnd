@@ -1,56 +1,57 @@
 <template>
   <div id="top">
     <v-card class="mb-4">
+      <v-form id="form">
+        <center>
+          <img src="~@/assets/bhmLogo.png">
+          <h3>Password Settings</h3>
+        </center>
+
+        <v-text-field
+          v-model="password"
+          id="current_password"
+          label="Current Password"
+          name="current_password"
+          prepend-icon="mdi-lock"
+          type="password"
+        ></v-text-field>
+        <v-text-field
+          v-model="password"
+          id="new_password"
+          label="New Password"
+          name="new_password"
+          prepend-icon="mdi-lock"
+          type="password"
+        ></v-text-field>
+        <v-text-field
+          v-model="password"
+          id="confirm_password"
+          label="Confirm Password"
+          name="confirmpassword"
+          prepend-icon="mdi-lock"
+          type="password"
+        ></v-text-field>
+      </v-form>
+      <v-spacer></v-spacer>
+      <v-btn color="success" id="btnSave" outline>Save Changes</v-btn>
+      <v-spacer></v-spacer>
     </v-card>
-    <v-stepper v-model="e1">
-      <v-stepper-header>
-        <template v-for="n in steps">
-          <v-stepper-step
-            :key="`${n}-step`"
-            :complete="e1 > n"
-            :step="n"
-            editable
-          >
-            Step {{ n }}
-          </v-stepper-step>
-
-          <v-divider
-            v-if="n !== steps"
-            :key="n"
-          ></v-divider>
-        </template>
-      </v-stepper-header>
-
-      <v-stepper-items>
-        <v-stepper-content
-          v-for="n in steps"
-          :key="`${n}-content`"
-          :step="n"
-        >
-          <v-card
-            class="mb-12"
-            color="grey lighten-1"
-            height="200px"
-          ></v-card>
-
-          <v-btn
-            color="primary"
-            @click="nextStep(n)"
-          >
-            Continue
-          </v-btn>
-
-          <v-btn text>Cancel</v-btn>
-        </v-stepper-content>
-      </v-stepper-items>
-    </v-stepper>
+    
   </div>
 </template>
 <style scoped>
-  #top{
-    margin-top:10px!important;
-    max-width: 400px!important;
-  }
+#top {
+  margin-top: 130px !important;
+  margin-left: 300px !important;
+  max-width: 400px !important;
+}
+#form{
+  padding: 20px;
+}
+#btnSave{
+  margin-left: 120px;
+  margin-bottom: 20px;
+}
 </style>
 <script>
 import axios from "axios";
@@ -59,7 +60,7 @@ export default {
   data() {
     return {
       e1: 1,
-        steps: 2,
+      steps: 2,
       username: "",
       newUsername: "",
       currentPassword: "",
@@ -73,24 +74,23 @@ export default {
           this.credentials.password === this.confirm_password ||
           "Passwords don't match !"
       },
-       watch: {
-      steps (val) {
-        if (this.e1 > val) {
-          this.e1 = val
+      watch: {
+        steps(val) {
+          if (this.e1 > val) {
+            this.e1 = val;
+          }
         }
-      },
-    },
+      }
     };
-    
   },
   methods: {
-    nextStep (n) {
-        if (n === this.steps) {
-          this.e1 = 1
-        } else {
-          this.e1 = n + 1
-        }
-      },
+    nextStep(n) {
+      if (n === this.steps) {
+        this.e1 = 1;
+      } else {
+        this.e1 = n + 1;
+      }
+    },
     save() {
       if (this.newPassword === this.confirmPassword) {
         axios

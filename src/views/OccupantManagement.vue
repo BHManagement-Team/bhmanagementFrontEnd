@@ -77,7 +77,7 @@
               outlined
               color="primary"
               @click="paymentDetail(item)"
-            >PAYMENT DETAILS</v-btn>
+            >PAYMENT DETAILS</v-btn><br>
             <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
             <v-btn class="text" outlined color="error" @click="openDialog(item._id) ">DELETE</v-btn>
           </template>
@@ -141,7 +141,7 @@
 
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn class="ma-2" outlined color="error" @click="closePaymentModal()">Cancel</v-btn>
+                    <v-btn class="ma-2" outlined color="error" @click="closeModal()">Cancel</v-btn>
                     <v-btn class="ma-2" outlined color="success" @click="closePaymentModal()">Save</v-btn>
                   </v-card-actions>
                 </v-card>
@@ -223,6 +223,9 @@
 .text {
   font-size: 10px !important;
   margin-left: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  height: 5px;
 }
 #successImg {
   margin-left: 150px;
@@ -243,6 +246,9 @@
 }
 .headline {
   margin-left: 35px !important;
+}
+v-btn{
+  max-width: 20px;
 }
 </style>
 <script>
@@ -409,6 +415,9 @@ export default {
     cloeseupdate() {
       this.updated = false;
     },
+    closeModal(){
+      paymentEdit = false
+    },
     close() {
       this.updated = false;
       this.confirm = false;
@@ -458,14 +467,9 @@ export default {
               occupant_contact: this.editedItem.occupant_contact
             })
             .then(response => {
-              console.log(response);
               this.occupant.push = populateOccupant();
               this.showSuccess();
-              for (let key in this.editedItem) {
-                if (this.editedItem.hasOwnProperty(key)) {
-                  this.editedItem[key] = "";
-                }
-              }
+              console.log(response);
             })
             .catch(error => {
               console.log(error);
