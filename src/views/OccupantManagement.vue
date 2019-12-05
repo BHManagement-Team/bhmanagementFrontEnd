@@ -77,9 +77,6 @@
             >PAYMENT DETAILS</v-btn>
             <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
-          <template v-slot:no-data>
-            <!-- <v-btn color="primary" @click="initialize">Reset</v-btn> -->
-          </template>
         </v-data-table>
         <!-- PAYMENT HISTORY -->
         <v-dialog v-model="payment" max-width="800px">
@@ -117,7 +114,7 @@
                     <v-card-actions>
                       <v-spacer></v-spacer>
                       <v-btn class="ma-2" outlined color="error" @click="closePaymentModal()">Cancel</v-btn>
-                      <v-btn class="ma-2" outlined color="success" @click="closePaymentModal(item)">Save</v-btn>
+                      <v-btn class="ma-2" outlined color="success" @click="closePaymentModal()">Save</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -175,6 +172,28 @@
 
 <script>
 import axios from "axios";
+function populateRoom(){
+      var room=[]
+      axios
+      .post("http://localhost:3000/bhm/retrieveAllRooms",{token:localStorage.token})
+      .then(response => {
+        var datax = response.data.data;
+        var counter = 0;
+        for (counter; counter < datax.length; counter++) {
+          room.push({
+            number:datax[counter]._id,
+            roomFloor: datax[counter].room_floor,
+            roomName: datax[counter].room_name,
+            roomCapacity: datax[counter].room_capacity,
+            rentPrice: datax[counter].room_price
+          });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+      return room
+    }
 export default {
   data: () => ({
     valid: true,
@@ -189,6 +208,9 @@ export default {
     modalPayment: false,
     payment: false,
     dialog: false,
+    room:[],
+    temporary:{},
+    temporary1:{},
     //payment section
     paymentHeaders: [
       {
@@ -252,6 +274,8 @@ export default {
     }
   },
   mounted() {
+    this.room=populateRoom()
+    console.log(this.room)
     this.populateOccupant();
   },
   methods: {
@@ -266,8 +290,7 @@ export default {
           token: this.$store.state.token
         })
         .then(response => {
-          console.log("this is the value of response after mounting: ");
-          console.log(response);
+        
           this.occupant = response.data.data;
         })
         .catch(error => {
@@ -281,7 +304,9 @@ export default {
       this.dialog = true;
     },
     editPayment(item) {
-      console.log("this it the value of item in editing payment: " + item);
+      console.log("fuckm")
+      console.log(item.billing_date)
+      this.temporary=item;
       this.editedIndex = 1;
       this.paymentEdit = true;
     },
@@ -312,8 +337,11 @@ export default {
           console.log("edit");
           Object.assign(this.occupant[this.editedIndex], this.editedItem);
         } else {
-          console.log(this.payment);
+          console.log(this.room[0].number)
+          // if(this.editedItem.roomName){
 
+          // }
+        
           axios
             .post("http://localhost:3000/bhm/createOccupant", {
               token: localStorage.token,
@@ -365,35 +393,45 @@ export default {
 
       this.payment = true;
     },
-    //saving for payment    
-    closePaymentModal(item) {
-      console.log(this.editedIndex);
+    //saving for payment
+    closePaymentModal() {
       if (this.editedIndex > -1) {
-         axios
+        axios
           .post("http://localhost:3000/bhm/updatePayment", {
             token: this.$store.state.token,
             amount: this.editedPayment.paymentAmount,
-            id:this.editedItem._id
+            id: this.editedItem._id
           })
-          .then(response => {
-            console.log(this.paymentHistory.unshift(response.data.data));
-            Object.assign(this.paymentHistory[this.paymentHistory.indexOf(item)], this.editedItem);
+          .then((response) => {        
+            console.log(response)
+            this.temporary1=this.temporary
+            this.temporary1.amount=parseInt( this.editedPayment.paymentAmount)
+            Object.assign(this.paymentHistory[this.paymentHistory.indexOf(this.temporary)], this.temporary1);
             this.modalPayment = false;
+            this.paymentEdit = false;
+            this.editedIndex= -1
+            this.editedPayment.paymentAmount=0
           })
           .catch(error => {
             console.log(error);
           });
-        this.paymentEdit = false;
+        
+       
       } else {
+       
         axios
           .post("http://localhost:3000/bhm/payment/" + this.editedItem._id, {
             token: this.$store.state.token,
             amount: this.editedPayment.paymentAmount
-          })
-          .then(response => {
-            console.log(this.paymentHistory.unshift(response.data.data));
 
+          })
+          .then((response) => {  
+            this.paymentHistory.unshift(response.data.data)
+            this.editedPayment.paymentAmount=0
             this.modalPayment = false;
+            this.paymentEdit = false;
+
+          
           })
           .catch(error => {
             console.log(error);
