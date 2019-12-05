@@ -72,21 +72,21 @@
             </v-toolbar>
           </template>
           <template v-slot:item.action="{ item }">
+            <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
             <v-btn
               class="text"
               outlined
               color="primary"
-              @click="payment = true,editedPayment(item)"
+              @click="paymentDetail(item)"
             >PAYMENT DETAILS</v-btn>
-            <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
-            <v-btn class="text" outlined color="error" @click="openDialog(item._id)">DELETE</v-btn>
+            <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
           </template>
         </v-data-table>
         <!-- PAYMENT HISTORY -->
-        <!-- <v-dialog v-model="payment" max-width="800px">
+        <v-dialog v-model="payment" max-width="800px">
           <v-data-table
             :headers="paymentHeaders"
-            :items="occupant"
+            :items="paymentHistory"
             sort-by="roomName"
             class="elevation-1"
           >
@@ -108,12 +108,7 @@
                     <v-card-text>
                       <v-container>
                         <v-text-field
-                          v-model="editedItem.roomFloor"
-                          label="Payment Date"
-                          type="Date"
-                        ></v-text-field>
-                        <v-text-field
-                          v-model="editedItem.roomName"
+                          v-model="editedPayment.paymentAmount"
                           label="Payment Amount"
                           type="Number"
                         ></v-text-field>
@@ -128,12 +123,38 @@
                   </v-card>
                 </v-dialog>
               </v-toolbar>
+              <v-dialog v-model="paymentEdit" max-width="500px">
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">{{paymentTitle}}</span>
+                  </v-card-title>
+
+                  <v-card-text>
+                    <v-container>
+                      <v-text-field
+                        v-model="editedPayment.paymentAmount"
+                        label="Payment Amount"
+                        type="Number"
+                      ></v-text-field>
+                    </v-container>
+                  </v-card-text>
+
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn class="ma-2" outlined color="error" @click="closePaymentModal()">Cancel</v-btn>
+                    <v-btn class="ma-2" outlined color="success" @click="closePaymentModal()">Save</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
             </template>
             <template v-slot:item.action="{ item }">
               <v-btn class="text" outlined color="success" @click="editPayment(item)">EDIT PAYMENT</v-btn>
             </template>
+            <template v-slot:no-data>
+              <!-- <v-btn color="primary" @click="initialize">Reset</v-btn> -->
+            </template>
           </v-data-table>
-        </v-dialog>-->
+        </v-dialog>
         <!-- END -->
         <!-- confirmation Modal -->
         <v-dialog v-model="confirm" max-width="500px" id="confirm">
@@ -269,6 +290,29 @@ export default {
     modalPayment: false,
     payment: false,
     dialog: false,
+    room:[],
+    temporary:{},
+    temporary1:{},
+    //payment section
+    paymentHeaders: [
+      {
+        text: "Payment Date",
+        align: "Amount",
+        value: "billing_date"
+      },
+      { text: "Amount", value: "amount", sortable: false },
+      { text: "Actions", value: "action", sortable: false }
+    ],
+    editedIndex: -1,
+    editedPayment: {
+      paymentDate: 0,
+      paymentAmount: 0
+    },
+    defaultPayment: {
+      paymentDate: 0,
+      paymentAmount: 0
+    },
+    //end payment section
     headers: [
       {
         text: "Room Floor",
@@ -284,13 +328,15 @@ export default {
     occupant: [],
     editedIndex: -1,
     editedItem: {
-      _id: "",
-      room_floor: "",
-      room_name: "",
-      occupant_name: "",
-      occupant_email: "",
-      occupant_contact: ""
+      id: "",
+      roomFloor: "",
+      roomName: "",
+      roomOccupant: "",
+      email: "",
+      contact: ""
     },
+    paymentHistory: [],
+    occupant: [],
     defaultItem: {
       _id: "",
       room_floor: "",
@@ -313,15 +359,16 @@ export default {
       val || this.close();
     }
   },
-
+  mounted() {
+    if (localStorage.token != "null") {
+      this.occupant = populateOccupant();
+    } else {
+      this.$router.push({ path: "/" });
+    }
+  },
   methods: {
     openDialog(id) {
       (this.confirm = true), (this.currentId = id);
-    },
-    editPayment(item) {
-      this.editedIndex = this.occupant.indexOf(item);
-      this.editedPayment = Object.assign({}, item);
-      this.dialog = true;
     },
     editItem(item) {
       this.editedIndex = this.occupant.indexOf(item);
@@ -341,19 +388,20 @@ export default {
           token: localStorage.token
         })
         .then(response => {
-          console.log(response);
-          this.occupant.splice(index -1, 1);
+          console.log(response)
+          this.occupant.splice(index-1, 1);
         })
         .catch(error => {
           console.log(error);
         });
       this.confirm = false;
     },
-    closePaymentModal() {
-      this.modalPayment = false;
-    },
-    closesuccess() {
-      this.success = false;
+    editPayment(item) {
+      console.log("fuckm")
+      console.log(item.billing_date)
+      this.temporary=item;
+      this.editedIndex = 1;
+      this.paymentEdit = true;
     },
     cloeseupdate() {
       this.updated = false;
@@ -369,55 +417,111 @@ export default {
       this.dialog = false;
     },
     save() {
+      if (this.$refs.form.validate()) {
+        if (this.editedIndex > -1) {
+          console.log("edit");
+          Object.assign(this.occupant[this.editedIndex], this.editedItem);
+        } else {
+          console.log(this.room[0].number)
+          // if(this.editedItem.roomName){
+
+          // }
+        
+          axios
+            .post("http://localhost:3000/bhm/createOccupant", {
+              token: localStorage.token,
+              room_name: this.editedItem.roomName,
+              room_floor: this.editedItem.roomFloor,
+              occupant_name: this.editedItem.roomOccupant,
+              occupant_email: this.editedItem.email,
+              occupant_contact: this.editedItem.contact
+            })
+            .then(response => {
+              this.occupant.push({
+                token: response.data,
+                room_name: this.editedItem.roomName,
+                room_floor: this.editedItem.roomFloor,
+                occupant_name: this.editedItem.roomOccupant,
+                occupant_email: this.editedItem.email,
+                occupant_contact: this.editedItem.contact
+              });
+              for (let key in this.editedItem) {
+                if (this.editedItem.hasOwnProperty(key)) {
+                  this.editedItem[key] = "";
+                }
+              }
+              this.$refs.form.resetValidation();
+              this.close();
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        }
+      }
+    },
+    paymentDetail(item) {
+      this.editedItem = Object.assign({}, item);
+      axios
+        .post(
+          "http://localhost:3000/bhm/retrievePaymentByID/" +
+            this.editedItem._id,
+          { token: this.$store.state.token }
+        )
+        .then(response => {
+          this.paymentHistory = response.data.data.reverse();
+
+          this.modalPayment = false;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+      this.payment = true;
+    },
+    //saving for payment
+    closePaymentModal() {
       if (this.editedIndex > -1) {
-        Object.assign(this.occupant[this.editedIndex], this.editedItem);
         axios
-          .post(
-            "http://localhost:3000/bhm/updateOccupant/" + this.editedItem._id,
-            {
-              _id: this.editedItem._id,
-              room_name: this.editedItem.room_name,
-              room_floor: this.editedItem.room_floor,
-              occupant_name: this.editedItem.occupant_name,
-              occupant_email: this.editedItem.occupant_email,
-              occupant_contact: this.editedItem.occupant_contact,
-              token: localStorage.token
-            }
-          )
-          .then(response => {
-            console.log(response);
-            this.showupdated();
+          .post("http://localhost:3000/bhm/updatePayment", {
+            token: this.$store.state.token,
+            amount: this.editedPayment.paymentAmount,
+            id: this.editedItem._id
+          })
+          .then((response) => {        
+            console.log(response)
+            this.temporary1=this.temporary
+            this.temporary1.amount=parseInt( this.editedPayment.paymentAmount)
+            Object.assign(this.paymentHistory[this.paymentHistory.indexOf(this.temporary)], this.temporary1);
+            this.modalPayment = false;
+            this.paymentEdit = false;
+            this.editedIndex= -1
+            this.editedPayment.paymentAmount=0
           })
           .catch(error => {
             console.log(error);
           });
-      } else if (this.$refs.form.validate()) {
-        this.snackbar = true;
-        this.occupant.push(this.editedItem);
+        
+       
+      } else {
+       
         axios
-          .post("http://localhost:3000/bhm/createOccupant", {
-            room_name: this.editedItem.room_name,
-            room_floor: this.editedItem.room_floor,
-            occupant_name: this.editedItem.occupant_name,
-            occupant_email: this.editedItem.occupant_email,
-            occupant_contact: this.editedItem.occupant_contact,
-            token: localStorage.token
+          .post("http://localhost:3000/bhm/payment/" + this.editedItem._id, {
+            token: this.$store.state.token,
+            amount: this.editedPayment.paymentAmount
+
           })
-          .then(response => {
-            console.log(response);
-            this.occupant = populateOccupant();
-            this.showSuccess()
+          .then((response) => {  
+            this.paymentHistory.unshift(response.data.data)
+            this.editedPayment.paymentAmount=0
+            this.modalPayment = false;
+            this.paymentEdit = false;
+
+          
+          })
+          .catch(error => {
+            console.log(error);
           });
       }
-      this.$refs.form.resetValidation();
-      this.close();
-    }
-  },
-  mounted() {
-    if (localStorage.token != "null") {
-      this.occupant = populateOccupant();
-    } else {
-      this.$router.push({ path: "/" });
     }
   }
 };

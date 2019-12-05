@@ -247,11 +247,7 @@ export default {
     }
   },
   mounted() {
-    if (localStorage.token != "null") {
-      this.room = populateRoom();
-    } else {
-      this.$router.push({ path: "/" });
-    }
+      this.room=populateRoom()  
   },
 
   watch: {
