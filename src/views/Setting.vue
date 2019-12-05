@@ -1,56 +1,67 @@
 <template>
-  <div id="top">
-    <v-card class="mb-4">
+ <div id="body">
+    <div>
+    <v-card class="mb-4" id="top">
       <v-form id="form">
         <center>
           <img src="~@/assets/bhmLogo.png">
           <h3>Password Settings</h3>
         </center>
-
         <v-text-field
-          v-model="password"
-          id="current_password"
+          v-model="username"
+          label="New Username"
+          name="current_username"
+          prepend-icon="mdi-lock"
+          type="text"
+        ></v-text-field>
+        <v-text-field
+          v-model="oldPassword"
           label="Current Password"
-          name="current_password"
           prepend-icon="mdi-lock"
           type="password"
         ></v-text-field>
         <v-text-field
-          v-model="password"
-          id="new_password"
+          v-model="newPassword"
           label="New Password"
-          name="new_password"
           prepend-icon="mdi-lock"
           type="password"
         ></v-text-field>
         <v-text-field
-          v-model="password"
-          id="confirm_password"
-          label="Confirm Password"
-          name="confirmpassword"
+          v-model="confirmPassword"
+          :rules="[rules.matchPassword]"
+          label="Confirm New Password"
           prepend-icon="mdi-lock"
           type="password"
         ></v-text-field>
       </v-form>
       <v-spacer></v-spacer>
-      <v-btn color="success" id="btnSave" outline>Save Changes</v-btn>
+      <v-btn color="success" id="btnSave" @click="save()">Save Changes</v-btn>
       <v-spacer></v-spacer>
+      <v-snackbar v-model="snackbar">
+        {{ text }}
+        <v-btn color="pink" text @click="snackbar = false">Close</v-btn>
+      </v-snackbar>
     </v-card>
-    
   </div>
+ </div>
 </template>
 <style scoped>
 #top {
-  margin-top: 130px !important;
-  margin-left: 300px !important;
-  max-width: 400px !important;
+  position: absolute;
+  top: 130px !important;
+  left: 300px !important;
+  width: 550px !important;
 }
-#form{
+#form {
   padding: 20px;
 }
-#btnSave{
-  margin-left: 120px;
+#btnSave {
+  margin-left: 180px;
   margin-bottom: 20px;
+}
+#body{
+  background-color: rgb(224, 224, 224);
+  height: 100%  ;
 }
 </style>
 <script>
@@ -59,11 +70,12 @@ export default {
   name: "settings",
   data() {
     return {
+      snackbar: false,
+      text: "",
       e1: 1,
       steps: 2,
       username: "",
-      newUsername: "",
-      currentPassword: "",
+      oldPassword: "",
       newPassword: "",
       confirmPassword: "",
       show1: false,
@@ -71,8 +83,7 @@ export default {
         required: value => !!value || "Required.",
         nameRules: v => /^[A-Z a-z]+$/.test(v) || "Name must be valid",
         matchPassword: () =>
-          this.credentials.password === this.confirm_password ||
-          "Passwords don't match !"
+          this.newPassword === this.confirmPassword || "Passwords don't match !"
       },
       watch: {
         steps(val) {
@@ -83,6 +94,15 @@ export default {
       }
     };
   },
+  mounted() {
+    var id = sessionStorage.getItem("id");
+    axios
+      .post("http://localhost:3000/bhm/retrievebyId/" + id)
+      .then(response => {
+        console.log(response);
+        this.username = response.data.data.username;
+      });
+  },
   methods: {
     nextStep(n) {
       if (n === this.steps) {
@@ -92,25 +112,31 @@ export default {
       }
     },
     save() {
-      if (this.newPassword === this.confirmPassword) {
         axios
           .post("http://localhost:3000/bhm/update", {
             username: this.username,
-            oldPassword: this.currentPassword,
+            oldPassword: this.oldPassword,
             newPassword: this.newPassword
           })
           .then(response => {
             console.log(response);
+            if (response.data.error) {
+              this.text = "Old Password is incorrect!!";
+              this.snackbar = true;
+            }
           })
           .catch(error => {
             console.log(error);
           });
-      }
     }
   }
 };
 </script>
 <style>
+#body{
+  background-color: rgb(224, 224, 224);
+  height: 100%  ;
+}
 template {
   text-align: center;
 }

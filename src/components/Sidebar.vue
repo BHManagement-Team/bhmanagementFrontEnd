@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app expand-on-hover hide-overlay permanent>
+  <v-navigation-drawer app expand-on-hover hide-overlay permanent id="">
     <template v-slot:prepend>
       <v-list>
         <v-list-item link two-line>

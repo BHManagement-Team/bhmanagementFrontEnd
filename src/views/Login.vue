@@ -40,6 +40,10 @@
                   <br>
                   <!-- </router-link> -->
                   <v-spacer></v-spacer>
+                  <v-snackbar v-model="snackbar">
+                    {{ text }}
+                    <v-btn color="pink" text @click="snackbar = false">Close</v-btn>
+                  </v-snackbar>
                 </v-card-actions>
               </v-card>
             </v-flex>
@@ -52,9 +56,12 @@
 <script>
 console.log(localStorage.token);
 export default {
+
   name: "Login",
   data() {
     return {
+      snackbar: false,
+      text: 'Incorrect username of password!',
       warning: ".",
       username: "",
       password: "",
@@ -68,12 +75,14 @@ export default {
       this.$store
         .dispatch("login", { email, password })
         .then(res => {
-          this.warningfunction(res);
+          sessionStorage.setItem("id", res.data.data._id);
           this.$router.push("/dashboard");
         })
-        .catch(err =>
-          console.log("error encountered while logging in: " + err)
-        );
+        .catch(err =>{
+          console.log(err);
+          
+        this.snackbar = true
+        });
     },
     warningfunction: function(res) {
       this.color = "red";

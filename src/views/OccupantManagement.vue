@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="body">
     <v-row>
       <v-col>
         <v-data-table
@@ -246,6 +246,10 @@
 }
 .headline {
   margin-left: 35px !important;
+}
+#body{
+  background-color: rgb(224, 224, 224);
+  height: 100%  ;
 }
 v-btn{
   max-width: 20px;

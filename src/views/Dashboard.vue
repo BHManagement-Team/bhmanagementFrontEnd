@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div id="body">
+    <div>
     <v-row>
       <v-col>
         <v-data-table
@@ -167,6 +168,7 @@
       </v-card>
     </v-dialog>
   </div>
+  </div>
 </template>
 <style>
 #table {
@@ -193,6 +195,10 @@
 }
 .headline {
   margin-left: 35px !important;
+}
+#body{
+  background-color: rgb(224, 224, 224);
+  height: 100%  ;
 }
 </style>
 <script>
