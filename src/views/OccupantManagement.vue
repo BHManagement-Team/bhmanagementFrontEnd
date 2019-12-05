@@ -381,6 +381,7 @@ export default {
     openDialog(id) {
       (this.confirm = true), (this.currentId = id);
     },
+    //for occupant transfering of data
     editItem(item) {
       this.editedIndex = this.occupant.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -407,6 +408,7 @@ export default {
         });
       this.confirm = false;
     },
+    //for editing payment clicking 
     editPayment(item) {
       console.log(item.billing_date);
       this.temporary = item;
@@ -471,7 +473,7 @@ export default {
               occupant_contact: this.editedItem.occupant_contact
             })
             .then(response => {
-              this.occupant.push = populateOccupant();
+              this.occupant= populateOccupant();
               this.showSuccess();
               console.log(response);
             })
@@ -483,11 +485,12 @@ export default {
         this.close();
       }
     },
-    paymentDetail(item) {
+    //for payment details
+    paymentDetail(item) {     
       this.editedItem = Object.assign({}, item);
       axios
         .post(
-          "http://localhost:3000/bhm/retrievePaymentByID/" +
+          "http://localhost:3000/bhm/retrievePaymentByOccID/" +
             this.editedItem._id,
           { token: this.$store.state.token }
         )
@@ -505,11 +508,12 @@ export default {
     //saving for payment
     closePaymentModal() {
       if (this.editedIndex > -1) {
+        console.log(this.temporary)
         axios
-          .post("http://localhost:3000/bhm/updatePayment", {
+          .post("http://localhost:3000/bhm/updateOnePayment/"+this.temporary._id, {
             token: this.$store.state.token,
-            amount: this.editedPayment.paymentAmount,
-            id: this.editedItem._id
+            amount: this.editedPayment.paymentAmount
+          
           })
           .then(response => {
             console.log(response);
