@@ -72,14 +72,14 @@
             </v-toolbar>
           </template>
           <template v-slot:item.action="{ item }">
-            <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
             <v-btn
               class="text"
               outlined
               color="primary"
               @click="paymentDetail(item)"
             >PAYMENT DETAILS</v-btn>
-            <v-btn class="text" outlined color="error" @click="deleteItem(item)">DELETE</v-btn>
+            <v-btn class="text" outlined color="success" @click="editItem(item)">OCCUPANT DETAILS</v-btn>
+            <v-btn class="text" outlined color="error" @click="openDialog(item._id) ">DELETE</v-btn>
           </template>
         </v-data-table>
         <!-- PAYMENT HISTORY -->
@@ -160,14 +160,14 @@
         <v-dialog v-model="confirm" max-width="500px" id="confirm">
           <v-card>
             <center>
-              <img src="~@/assets/del.gif" id="delImg" />
+              <img src="~@/assets/del.gif" id="delImg">
             </center>
             <v-card-title>
               <span class="headline">Are you sure you want to delete?</span>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <br />
+              <br>
               <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
               <v-btn class="ma-2" outlined color="success" @click="deleteItem(currentId)">Yes</v-btn>
             </v-card-actions>
@@ -178,16 +178,16 @@
           <v-card>
             <v-card-title>
               <center>
-                <img src="~@/assets/suc.gif" id="successImg" />
+                <img src="~@/assets/suc.gif" id="successImg">
               </center>
-              <br />
+              <br>
               <h2 class="headline">Room has been added successfully!!</h2>
-              <br />
+              <br>
               <v-spacer></v-spacer>
-              <br />
-              <br />
+              <br>
+              <br>
               <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn>
-              <br />
+              <br>
               <v-spacer></v-spacer>
             </v-card-title>
           </v-card>
@@ -196,16 +196,16 @@
           <v-card>
             <v-card-title>
               <center>
-                <img src="~@/assets/suc.gif" id="successImg" />
+                <img src="~@/assets/suc.gif" id="successImg">
               </center>
-              <br />
+              <br>
               <h2 class="headline">Room has been updated successfully!!</h2>
-              <br />
+              <br>
               <v-spacer></v-spacer>
-              <br />
-              <br />
+              <br>
+              <br>
               <v-btn class="btnClose" outlined color="success" @click="cloeseupdate()">C L O S E</v-btn>
-              <br />
+              <br>
               <v-spacer></v-spacer>
             </v-card-title>
           </v-card>
@@ -275,10 +275,11 @@ function populateOccupant() {
 }
 export default {
   data: () => ({
-    updated:false,
+    updated: false,
     confirm: false,
     success: false,
     currentId: null,
+    paymentEdit : false,
     valid: true,
     name: "",
     nameRules: [v => !!v || "Name is required"],
@@ -290,9 +291,9 @@ export default {
     modalPayment: false,
     payment: false,
     dialog: false,
-    room:[],
-    temporary:{},
-    temporary1:{},
+    room: [],
+    temporary: {},
+    temporary1: {},
     //payment section
     paymentHeaders: [
       {
@@ -375,7 +376,7 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
-     showSuccess() {
+    showSuccess() {
       this.success = true;
     },
     showupdated() {
@@ -388,8 +389,8 @@ export default {
           token: localStorage.token
         })
         .then(response => {
-          console.log(response)
-          this.occupant.splice(index-1, 1);
+          console.log(response);
+          this.occupant.splice(index -1, 1);
         })
         .catch(error => {
           console.log(error);
@@ -397,11 +398,13 @@ export default {
       this.confirm = false;
     },
     editPayment(item) {
-      console.log("fuckm")
-      console.log(item.billing_date)
-      this.temporary=item;
+      console.log(item.billing_date);
+      this.temporary = item;
       this.editedIndex = 1;
       this.paymentEdit = true;
+    },
+    closesuccess() {
+      this.success = false;
     },
     cloeseupdate() {
       this.updated = false;
@@ -421,42 +424,55 @@ export default {
         if (this.editedIndex > -1) {
           console.log("edit");
           Object.assign(this.occupant[this.editedIndex], this.editedItem);
-        } else {
-          console.log(this.room[0].number)
-          // if(this.editedItem.roomName){
-
-          // }
-        
+          axios
+            .post(
+              "http://localhost:3000/bhm/updateOccupant/" + this.editedItem._id,
+              {
+                _id: this.editedItem._id,
+                room_name: this.editedItem.room_name,
+                room_floor: this.editedItem.room_floor,
+                occupant_name: this.editedItem.occupant_name,
+                occupant_email: this.editedItem.occupant_email,
+                occupant_contact: this.editedItem.occupant_contact,
+                token: localStorage.token
+              }
+            )
+            .then(response => {
+              console.log(response);
+              this.showupdated();
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        } else if (this.$refs.form.validate()) {
+          this.snackbar = true;
+          this.room.push(this.editedItem);
           axios
             .post("http://localhost:3000/bhm/createOccupant", {
               token: localStorage.token,
-              room_name: this.editedItem.roomName,
-              room_floor: this.editedItem.roomFloor,
-              occupant_name: this.editedItem.roomOccupant,
-              occupant_email: this.editedItem.email,
-              occupant_contact: this.editedItem.contact
+              _id: this.editedItem._id,
+              room_name: this.editedItem.room_name,
+              room_floor: this.editedItem.room_floor,
+              occupant_name: this.editedItem.occupant_name,
+              occupant_email: this.editedItem.occupant_email,
+              occupant_contact: this.editedItem.occupant_contact
             })
             .then(response => {
-              this.occupant.push({
-                token: response.data,
-                room_name: this.editedItem.roomName,
-                room_floor: this.editedItem.roomFloor,
-                occupant_name: this.editedItem.roomOccupant,
-                occupant_email: this.editedItem.email,
-                occupant_contact: this.editedItem.contact
-              });
+              console.log(response);
+              this.occupant.push = populateOccupant();
+              this.showSuccess();
               for (let key in this.editedItem) {
                 if (this.editedItem.hasOwnProperty(key)) {
                   this.editedItem[key] = "";
                 }
               }
-              this.$refs.form.resetValidation();
-              this.close();
             })
             .catch(error => {
               console.log(error);
             });
         }
+        this.$refs.form.resetValidation();
+        this.close();
       }
     },
     paymentDetail(item) {
@@ -487,36 +503,33 @@ export default {
             amount: this.editedPayment.paymentAmount,
             id: this.editedItem._id
           })
-          .then((response) => {        
-            console.log(response)
-            this.temporary1=this.temporary
-            this.temporary1.amount=parseInt( this.editedPayment.paymentAmount)
-            Object.assign(this.paymentHistory[this.paymentHistory.indexOf(this.temporary)], this.temporary1);
+          .then(response => {
+            console.log(response);
+            this.temporary1 = this.temporary;
+            this.temporary1.amount = parseInt(this.editedPayment.paymentAmount);
+            Object.assign(
+              this.paymentHistory[this.paymentHistory.indexOf(this.temporary)],
+              this.temporary1
+            );
             this.modalPayment = false;
             this.paymentEdit = false;
-            this.editedIndex= -1
-            this.editedPayment.paymentAmount=0
+            this.editedIndex = -1;
+            this.editedPayment.paymentAmount = 0;
           })
           .catch(error => {
             console.log(error);
           });
-        
-       
       } else {
-       
         axios
           .post("http://localhost:3000/bhm/payment/" + this.editedItem._id, {
             token: this.$store.state.token,
             amount: this.editedPayment.paymentAmount
-
           })
-          .then((response) => {  
-            this.paymentHistory.unshift(response.data.data)
-            this.editedPayment.paymentAmount=0
+          .then(response => {
+            this.paymentHistory.unshift(response.data.data);
+            this.editedPayment.paymentAmount = 0;
             this.modalPayment = false;
             this.paymentEdit = false;
-
-          
           })
           .catch(error => {
             console.log(error);
