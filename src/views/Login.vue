@@ -10,7 +10,7 @@
                 <v-card-text>
                   <v-form>
                     <center>
-                      <img src="~@/assets/bhmLogo.png" />
+                      <img src="~@/assets/bhmLogo.png">
                       <h3>BHManagement System</h3>
                     </center>
                     <v-text-field
@@ -30,63 +30,65 @@
                     ></v-text-field>
                   </v-form>
                 </v-card-text>
-                <center  v-bind:style="{ color: color }" id="warnMessage">{{warning}}</center>
+                <center v-bind:style="{ color: color }" id="warnMessage">{{warning}}</center>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <!-- <router-link class="btnLogin" :to="'/toDashboard'"> -->
                   <v-btn v-on:click="login" color="primary">Login</v-btn>
                   <!-- @click='login()' -->
-                  <br />
-                  <br />
+                  <br>
+                  <br>
                   <!-- </router-link> -->
                   <v-spacer></v-spacer>
-                  
+                  <v-snackbar v-model="snackbar">
+                    {{ text }}
+                    <v-btn color="pink" text @click="snackbar = false">Close</v-btn>
+                  </v-snackbar>
                 </v-card-actions>
-                  
               </v-card>
-            
             </v-flex>
-            
           </v-layout>
-          
         </v-container>
-       
       </v-content>
-      
     </v-app>
-     
   </div>
-  
 </template>
 <script>
+console.log(localStorage.token);
 export default {
+
   name: "Login",
   data() {
     return {
-      warning:".",
+      snackbar: false,
+      text: 'Incorrect username of password!',
+      warning: ".",
       username: "",
       password: "",
-      color:'white',
+      color: "white"
     };
   },
-  methods: { 
-      login: function () {
-        let email = this.username
-        let password = this.password
-        this.$store.dispatch('login', { email, password })
-       .then((res) =>{
-        this.warningfunction(res)
-      
-         this.$router.push('/dashboard')
-       }
-       )
-       .catch(err => console.log("error encountered while logging in: "+err))
-      },
-      warningfunction:function(res){     
-        this.color='red'
-        this.warning=JSON.stringify(res.data.message);
-      }
-            
+  methods: {
+    login: function() {
+      let email = this.username;
+      let password = this.password;
+      this.$store
+        .dispatch("login", { email, password })
+        .then(res => {
+          sessionStorage.setItem("id", res.data.data._id);
+          this.$router.push("/dashboard");
+        })
+        .catch(err =>{
+          console.log(err);
+          
+        this.snackbar = true
+        });
+    },
+    warningfunction: function(res) {
+      this.color = "red";
+      console.log("i made it: " + JSON.stringify(res.data.message));
+      this.warning = JSON.stringify(res.data.message);
+    }
   },
   props: {}
 };
@@ -107,7 +109,7 @@ img {
   background-size: cover;
   transform: scale(1.1);
 }
-#warnMessage{
+#warnMessage {
   color: red;
 }
 </style>
