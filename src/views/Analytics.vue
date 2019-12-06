@@ -2,12 +2,14 @@
   <v-container fluid id="text">
     <v-row>
       <v-card class="class female">
+        <h1>Number of Female Occupants:</h1>
         <v-text-field v-model="female" prepend-icon="mdi-account-group" type="text" class="Text" disabled></v-text-field>
       </v-card>
     </v-row>
     <v-row>
       <div id="Male">
         <v-card class="class">
+        <h1>Number of Male Occupants:</h1>
           <v-text-field v-model="male" prepend-icon="mdi-account-group-outline" type="text" class="Text" disabled></v-text-field>
         </v-card>
       </div>
@@ -21,17 +23,21 @@
 }
 .female {
   position: absolute;
-  top: 100px;
-  left: 300px;
+  top: 300px;
+  left: 250px;
 }
 #Male {
   position: absolute;
   top: 300px;
-  left: 300px;
+  left: 850px;
 }
 .Text{
     font-size: 20px!important;
     color: black!important;
+}
+#text{
+  background-color: rgb(224, 224, 224);
+  height: 100%  ;
 }
 </style>
 <script>

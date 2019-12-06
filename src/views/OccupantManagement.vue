@@ -194,7 +194,7 @@
                 <img src="~@/assets/suc.gif" id="successImg" />
               </center>
               <br />
-              <h2 class="headline">Room has been added successfully!!</h2>
+              <h2 class="headline">Occupant added successfully!!</h2>
               <br />
               <v-spacer></v-spacer>
               <br />

@@ -6,7 +6,7 @@
         <v-data-table
           :headers="headers"
           :items="room"
-          sort-by="roomName"
+          sort-by="room_name"
           class="elevation-1"
           id="table"
           :search="search"
@@ -38,21 +38,21 @@
                         <v-row>
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.roomFloor"
+                              v-model="editedItem.room_floor"
                               label="Room Floor"
                               :rules="floorRules"
                             ></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.roomName"
+                              v-model="editedItem.room_name"
                               label="Room Name"
                               :rules="nameRules"
                             ></v-text-field>
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.roomCapacity"
+                              v-model="editedItem.room_capacity"
                               label="Room Capacity"
                               :rules="capacityRules"
                               type="number"
@@ -60,7 +60,7 @@
                           </v-col>
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.rentPrice"
+                              v-model="editedItem.room_price"
                               label="Rent Price"
                               :rules="priceRules"
                               type="number"
@@ -203,7 +203,7 @@ import axios from "axios";
 function populateRoom() {
   var room = [];
   axios
-    .post("http://172.16.3.20:3000/bhm/retrieveAllRooms", {
+    .post("http://localhost:3000/bhm/retrieveAllRooms", {
       token: localStorage.token
     })
     .then(response => {
@@ -213,10 +213,10 @@ function populateRoom() {
       for (counter; counter < datax.length; counter++) {
         room.push({
           number: datax[counter]._id,
-          roomFloor: datax[counter].room_floor,
-          roomName: datax[counter].room_name,
-          roomCapacity: datax[counter].room_capacity,
-          rentPrice: datax[counter].room_price
+          room_floor: datax[counter].room_floor,
+          room_name: datax[counter].room_name,
+          room_capacity: datax[counter].room_capacity,
+          room_price: datax[counter].room_price
         });
       }
     })
@@ -244,21 +244,21 @@ export default {
       {
         text: "Room Floor",
         align: "left",
-        value: "roomFloor"
+        value: "room_floor"
       },
-      { text: "Room Name", value: "roomName" },
-      { text: "Room Capacity", value: "roomCapacity" },
-      { text: "Rent Price", value: "rentPrice" },
+      { text: "Room Name", value: "room_name" },
+      { text: "Room Capacity", value: "room_capacity" },
+      { text: "Rent Price", value: "room_price" },
       { text: "Actions", value: "action", sortable: false }
     ],
     room: [],
     editedIndex: -1,
     editedItem: {
       number: "",
-      roomFloor: "",
-      roomName: "",
-      roomCapacity: "",
-      rentPrice: ""
+      room_floor: "",
+      room_name: "",
+      room_capacity: "",
+      room_price: ""
     }
   }),
   computed: {
@@ -298,7 +298,7 @@ export default {
     deleteItem(id) {
       const index = this.room.indexOf(id);
       axios
-        .post("http://172.16.3.20:3000/bhm/deleteRoomByID/" + id, {
+        .post("http://localhost:3000/bhm/deleteRoomByID/" + id, {
           token: localStorage.token
         })
         .then(response => {
@@ -330,9 +330,9 @@ export default {
       }, 300);
     },
     save() {
-      if (this.editedItem.roomFloor < 0) {
+      if (this.editedItem.room_floor < 0) {
         alert("Room Floor cant be below 0");
-        if (this.editedItem.roomCapacity < 0) {
+        if (this.editedItem.room_capacity < 0) {
           alert("Room Capacity cant be below 0");
         }
       } else {
@@ -340,13 +340,13 @@ export default {
           Object.assign(this.room[this.editedIndex], this.editedItem);
           axios
             .post(
-              "http://172.16.3.20:3000/bhm/updateRoom/" + this.editedItem.number,
+              "http://localhost:3000/bhm/updateRoom/" + this.editedItem.number,
               {
                 _id: this.editedItem.number,
-                room_name: this.editedItem.roomName,
-                room_floor: this.editedItem.roomFloor,
-                room_capacity: this.editedItem.roomCapacity,
-                room_price: this.editedItem.rentPrice,
+                room_name: this.editedItem.room_name,
+                room_floor: this.editedItem.room_floor,
+                room_capacity: this.editedItem.room_capacity,
+                room_price: this.editedItem.room_price,
                 token: localStorage.token
               }
             )
@@ -362,11 +362,11 @@ export default {
           this.snackbar = true;
           this.room.push(this.editedItem);
           axios
-            .post("http://172.16.3.20:3000/bhm/createRoom", {
-              room_name: this.editedItem.roomName,
-              room_floor: this.editedItem.roomFloor,
-              room_capacity: this.editedItem.roomCapacity,
-              room_price: this.editedItem.rentPrice,
+            .post("http://localhost:3000/bhm/createRoom", {
+              room_name: this.editedItem.room_name,
+              room_floor: this.editedItem.room_floor,
+              room_capacity: this.editedItem.room_capacity,
+              room_price: this.editedItem.room_price,
               token: localStorage.token
             })
             .then((this.room.push = populateRoom()), this.showSuccess())
