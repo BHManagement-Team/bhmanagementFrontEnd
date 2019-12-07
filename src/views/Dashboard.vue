@@ -236,7 +236,7 @@ export default {
       rentPrice: ""
     },
     //temporary value for editing
-    ItemInRow:{
+    ItemInRow: {
       number: "",
       roomFloor: "",
       roomName: "",
@@ -262,12 +262,11 @@ export default {
   },
   methods: {
     populateRoom() {
-  
       axios
         .post("http://localhost:3000/bhm/retrieveAllRooms", {
           token: this.$store.state.token
         })
-        .then(response => {       
+        .then(response => {
           var datax = response.data.data;
           var counter = 0;
           for (counter; counter < datax.length; counter++) {
@@ -281,13 +280,13 @@ export default {
           }
         })
         .catch(error => {
-          console.log("fucking "+error);
+          console.log("fucking " + error);
         });
     },
     editItem(item) {
       this.editedIndex = this.room.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      console.log(this.editedItem)
+      console.log(this.editedItem);
       this.dialog = true;
     },
     openDialog(id) {
@@ -304,9 +303,10 @@ export default {
     },
     deleteItem(id) {
       const index = this.room.indexOf(id);
+      console.log(id)
       axios
         .post("http://localhost:3000/bhm/deleteRoomByID/" + id, {
-          token: localStorage.token
+          token: this.$store.state.token
         })
         .then(response => {
           console.log(response);
@@ -346,8 +346,7 @@ export default {
         if (this.editedIndex > -1) {
           axios
             .post(
-              "http://localhost:3000/bhm/updateRoom/" +
-                this.editedItem.number,
+              "http://localhost:3000/bhm/updateRoom/" + this.editedItem.number,
               {
                 _id: this.editedItem.number,
                 room_name: this.editedItem.roomName,
@@ -358,21 +357,16 @@ export default {
               }
             )
             .then(() => {
-              console.log(this.editedItem.roomName)
-              Object.assign(
-              this.room[this.editedIndex],
-              this.editedItem
-            );
+              Object.assign(this.room[this.editedIndex], this.editedItem);
               this.showupdated();
               this.close();
             })
             .catch(error => {
-
               console.log(error);
             });
         } else if (this.$refs.form.validate()) {
           alert("I'm saving it now");
-          this.snackbar = true;     
+          this.snackbar = true;
           axios
             .post("http://localhost:3000/bhm/createRoom", {
               room_name: this.editedItem.roomName,
@@ -381,13 +375,16 @@ export default {
               room_price: this.editedItem.rentPrice,
               token: this.$store.state.token
             })
-            .then(this.room.push(this.editedItem),this.showSuccess(),this.close())
-            .catch(error => {            
+            .then(
+              this.room.push(this.editedItem),
+              this.showSuccess(),
+              this.close()
+            )
+            .catch(error => {
               console.log(error);
             });
         }
       }
-      
     }
   }
 };
