@@ -85,6 +85,10 @@
                 </v-dialog>
               </v-toolbar>
             </template>
+            
+            <template v-slot:item.addOccupant="{ item }">
+              <v-btn  rounded color="primary" dark  :disabled='isDisabled'>Add Ocuppants</v-btn>
+            </template>
             <template v-slot:item.action="{ item }">
               <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
               <v-icon small @click="openDialog(item.number)">mdi-delete</v-icon>
@@ -201,7 +205,9 @@
 <script>
 import axios from "axios";
 export default {
+
   data: () => ({
+
     search: "",
     deleteconfirm: false,
     confirm: false,
@@ -211,10 +217,12 @@ export default {
     dialog: false,
     currentId: null,
     dialog: false,
+    //rules in room input fields
     floorRules: [v => !!v || "Room Floor is required"],
     nameRules: [v => !!v || "Name is required"],
     capacityRules: [v => !!v || "Capacity is required"],
     priceRules: [v => !!v || "Price is required"],
+    //header for tables
     headers: [
       {
         text: "Room Floor",
@@ -222,8 +230,10 @@ export default {
         value: "roomFloor"
       },
       { text: "Room Name", value: "roomName" },
-      { text: "Room Capacity", value: "roomCapacity" },
       { text: "Rent Price", value: "rentPrice" },
+      { text: "Room Capacity", value: "roomCapacity" },
+      { text: "Room Status", value: "Full" },
+      { text: "Add Ocuppants", value: "addOccupant", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
     room: [],
@@ -289,6 +299,7 @@ export default {
       console.log(this.editedItem);
       this.dialog = true;
     },
+    //dialogs after transaction
     openDialog(id) {
       (this.confirm = true), (this.currentId = id);
     },

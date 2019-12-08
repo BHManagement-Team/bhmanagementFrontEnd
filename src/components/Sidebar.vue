@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app expand-on-hover hide-overlay permanent id="">
+  <v-navigation-drawer app expand-on-hover hide-overlay permanent id="hi">
     <template v-slot:prepend>
       <v-list>
         <v-list-item link two-line>
@@ -8,13 +8,13 @@
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title class="title">BH Management</v-list-item-title>
-            <v-list-item-subtitle>we make your day</v-list-item-subtitle>
+            <v-list-item-subtitle id="subtitle">we make your day</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>
     </template>
 
-    <v-divider></v-divider>
+    <v-divider id="divider"></v-divider>
 
     <v-list nav>
       <v-list-item link>
@@ -44,6 +44,13 @@
     </v-list>
   </v-navigation-drawer>
 </template>
+<style  scoped>
+ #divider{
+   background-color:white;
+   width: 95%;
+ }
+
+</style>
 <script>
 export default {
   name: "Sidebar",

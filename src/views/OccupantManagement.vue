@@ -24,9 +24,7 @@
               <v-spacer></v-spacer>
 
               <v-dialog v-model="dialog" max-width="500px">
-                <template v-slot:activator="{ on }">
-                  <v-btn color="primary" dark class="mb-2" v-on="on">Add Occupant</v-btn>
-                </template>
+                
                 <v-card>
                   <v-form ref="form" v-model="valid" lazy-validation>
                     <v-card-title>
