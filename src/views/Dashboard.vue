@@ -347,31 +347,63 @@ export default {
     },
 
     populateRoom() {
-      
-      async function getRooms(tokenVar) {
-        
-        var respon=axios
-        .post("http://localhost:3000/bhm/retrieveAllRooms", {
-          token: tokenVar
-        })
-        .then(response => {  
-            
-          return response
-        })
-        .catch(error => {
-          console.log("when no rooms found" + error);
-        });
-       
-        return await respon  
-        
 
+      async function getRooms(tokenVar) {
+        var respon = axios
+          .post("http://localhost:3000/bhm/retrieveAllRooms", {
+            token: tokenVar
+          })
+          .then(response => {
+            return response;
+          })
+          .catch(error => {
+            console.log("when no rooms found" + error);
+          });
+
+        return await respon;
       }
-      // async function getOccupant() {}
+
+      //get occupant
+      async function getOccupant(tokenVar,roomData) {
+        // var counter = 0;
+         var OccupantCount =[];
+          for(const item of roomData){
+         let response = await axios.post("http://localhost:3000/bhm/retrieveRoomOcc", {
+                token: tokenVar,
+                room_ID:item._id
+              })
+              if(response.data.data==null ){
+              OccupantCount.push("Empty")
+              }else{
+               OccupantCount.push(response.data.data) 
+              }
+            
+      }
+       return OccupantCount
+      }
 
       getRooms(this.$store.state.token)
-        .then((respon)=>{
-          console.log(respon.data.data)
-        }
+        .then(
+          respon => {
+            this.datax = respon.data.data;
+            getOccupant(this.$store.state.token, this.datax).then(response => {
+              
+              this.occupantNum=response;
+              var counter = 0;
+              for (counter; counter < this.datax.length; counter++) {
+                 console.log(this.occupantNum[counter]) 
+                this.room.push({
+                  number: this.datax[counter]._id,
+                  roomFloor: this.datax[counter].room_floor,
+                  roomName: this.datax[counter].room_name,
+                  status: this.occupantNum[counter],
+                  roomCapacity: this.datax[counter].room_capacity,
+                  rentPrice: this.datax[counter].room_price
+                });
+              
+              }
+            });
+          }
 
           // getOccupant()
           //   .then()
