@@ -86,15 +86,16 @@
               </v-toolbar>
             </template>
             <template v-slot:item.status="{ item }">
-               <span>{{item.status}}</span><v-icon small class="mr-2" @click="editItem(item)">mdi-account</v-icon>
+              <span>{{item.status}}</span>
+              <v-icon small class="mr-2" @click="editItem(item)">mdi-account</v-icon>
             </template>
             <v-icon small class="mr-2" @click="editItem(item)">mdi-account</v-icon>
             <template v-slot:item.addOccupant="{ item }">
-              <v-btn  :disabled="isDisable(item)"  @click="editPayment(item)">Add Occupant</v-btn>
+              <v-btn :disabled="isDisable(item)" @click="editPayment(item)">Add Occupant</v-btn>
             </template>
             <template v-slot:item.action="{ item }">
               <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
-              
+
               <v-icon small @click="openDialog(item.number)">mdi-delete</v-icon>
             </template>
           </v-data-table>
@@ -155,47 +156,46 @@
         </v-card>
       </v-dialog>
       <v-dialog v-model="addOccupant" max-width="500px">
-                
-                <v-card>
-                  <v-form ref="form"  lazy-validation>
-                    <v-card-title>
-                      <span class="headline">Add Occupant</span>
-                    </v-card-title>
+        <v-card>
+          <v-form ref="form" lazy-validation>
+            <v-card-title>
+              <span class="headline">Add Occupant</span>
+            </v-card-title>
 
-                    <v-card-text>
-                      <v-container>
-                        <v-text-field
-                          v-model="editedOccupant.occupant_name"
-                          label="Name"
-                          :rules="nameRules"
-                        ></v-text-field>
-                        <v-text-field
-                          v-model="editedOccupant.occupant_email"
-                          label="Email"
-                          :rules="emailRules"
-                        ></v-text-field>
-                        <v-text-field
-                          v-model="editedOccupant.occupant_contact"
-                          label="Contact"
-                          :rules="nameRules"
-                        ></v-text-field>
-                      </v-container>
-                    </v-card-text>
+            <v-card-text>
+              <v-container>
+                <v-text-field
+                  v-model="editedOccupant.occupant_name"
+                  label="Name"
+                  :rules="nameRules"
+                ></v-text-field>
+                <v-text-field
+                  v-model="editedOccupant.occupant_email"
+                  label="Email"
+                  :rules="emailRules"
+                ></v-text-field>
+                <v-text-field
+                  v-model="editedOccupant.occupant_contact"
+                  label="Contact"
+                  :rules="nameRules"
+                ></v-text-field>
+              </v-container>
+            </v-card-text>
 
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
-                      <v-btn
-                        class="ma-2"
-                        outlined
-                        color="success"
-                        @click="createOccupant()"
-                        :disabled="!valid"
-                      >Save</v-btn>
-                    </v-card-actions>
-                  </v-form>
-                </v-card>
-              </v-dialog>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn class="ma-2" outlined color="error" @click="close()">Cancel</v-btn>
+              <v-btn
+                class="ma-2"
+                outlined
+                color="success"
+                @click="createOccupant()"
+                :disabled="!valid"
+              >Save</v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card>
+      </v-dialog>
       <v-dialog v-model="updated" max-width="500px" id="confirm">
         <v-card>
           <v-card-title>
@@ -250,10 +250,11 @@
 </style>
 <script>
 import axios from "axios";
-export default {
 
+export default {
   data: () => ({
-    disable:false,
+    datax: [],
+    disable: false,
     search: "",
     deleteconfirm: false,
     confirm: false,
@@ -263,9 +264,10 @@ export default {
     dialog: false,
     currentId: null,
     dialog: false,
-    addOccupant:false,
+    addOccupant: false,
+    occupantNum: [],
     //for the status
-    tempNumber:"ss",
+    tempNumber: "ss",
     nameRules: [v => !!v || "Name is required"],
     email: "",
     emailRules: [
@@ -287,7 +289,7 @@ export default {
       { text: "Room Name", value: "roomName" },
       { text: "Rent Price", value: "rentPrice" },
       { text: "Room Capacity", value: "roomCapacity" },
-      { text: "Room Status", value:  "status"},
+      { text: "Room Status", value: "status" },
       { text: "Add Ocuppants", value: "addOccupant", sortable: false },
       { text: "Actions", value: "action", sortable: false }
     ],
@@ -300,11 +302,10 @@ export default {
       roomCapacity: "",
       rentPrice: ""
     },
-    editedOccupant:{
-      occupant_name:"",
-      occupant_email:"",
-      occupant_contact:""
-
+    editedOccupant: {
+      occupant_name: "",
+      occupant_email: "",
+      occupant_contact: ""
     },
     //temporary value for editing
     ItemInRow: {
@@ -320,11 +321,10 @@ export default {
       return this.editedIndex === -1
         ? "Add Room Details"
         : "Update Existing Room Details";
-    },
+    }
   },
   mounted() {
     this.populateRoom();
-
   },
 
   watch: {
@@ -333,50 +333,100 @@ export default {
     }
   },
   methods: {
-    editPayment(item){
-      console.log(item)
+    editPayment(item) {
+      console.log(item);
       this.editedItem = Object.assign({}, item);
-      this.addOccupant=true   
+      this.addOccupant = true;
     },
     isDisable(item) {
-      if(item.status=="ss"){
-        return true 
+      if (item.status == "ss") {
+        return true;
       }
-        // check option and index
-        // return true - disable, false - active
-      },
-    populateRoom() {
-      
-      axios
-        .post("http://localhost:3000/bhm/retrieveAllRooms", {
-          token: this.$store.state.token
-        })
-        .then(response => {
-          var datax = response.data.data;
-          var counter = 0;
-          for (counter; counter < datax.length; counter++) {
-            if(counter==1){
-              this.tempNumber="Full na po"
-            }else{       
-              this.tempNumber="ss"
-            }         
-            this.room.push({
-              number: datax[counter]._id,
-              roomFloor: datax[counter].room_floor,
-              roomName: datax[counter].room_name,
-              status: this.tempNumber,
-              roomCapacity: datax[counter].room_capacity,
-              rentPrice: datax[counter].room_price
-            });
-          }
-        })
-        .catch(error => {
-          console.log("ffgf " + error);
-        });
+      // check option and index
+      // return true - disable, false - active
     },
 
+    populateRoom() {
+      
+      async function getRooms(tokenVar) {
+        
+        var respon=axios
+        .post("http://localhost:3000/bhm/retrieveAllRooms", {
+          token: tokenVar
+        })
+        .then(response => {  
+            
+          return response
+        })
+        .catch(error => {
+          console.log("when no rooms found" + error);
+        });
+       
+        return await respon  
+        
 
+      }
+      // async function getOccupant() {}
 
+      getRooms(this.$store.state.token)
+        .then((respon)=>{
+          console.log(respon.data.data)
+        }
+
+          // getOccupant()
+          //   .then()
+          //   .catch()
+        )
+        .catch();
+      // axios
+      //   .post("http://localhost:3000/bhm/retrieveAllRooms", {
+      //     token: this.$store.state.token
+      //   })
+      //   .then(response => {
+      //     this.datax = response.data.data;
+
+      //   })
+      //   .catch(error => {
+      //     console.log("when no rooms found" + error);
+      //   });
+
+      //   console.log(this.datax)
+
+      //   axios
+      //   .post("http://localhost:3000/bhm/retrieveRoomOcc", {
+      //     token: this.$store.state.token,
+      //     room_ID:"5dedaf593bed808b60ecc1c2"
+      //   })
+      //   .then(response => {
+      //     console.log(response)
+
+      //     var counter = 0;
+      //     for (counter; counter < this.datax.length; counter++) {
+      //      this.occupantNum.push(counter)
+      //     }
+      //     var counter = 0;
+      //     for (counter; counter < this.datax.length; counter++) {
+      //       this.tempNumber=this.occupantNum[counter]
+      //       if(this.occupantNum[counter]==0 ){
+      //         this.tempNumber="empty"
+      //       }else {
+
+      //       }
+      //       this.room.push({
+      //         number: this.datax[counter]._id,
+      //         roomFloor: this.datax[counter].room_floor,
+      //         roomName: this.datax[counter].room_name,
+      //         status: this.tempNumber,
+      //         roomCapacity: this.datax[counter].room_capacity,
+      //         rentPrice: this.datax[counter].room_price
+      //       });
+      //     }
+      //   })
+      //   .catch(error => {
+      //     console.log("when no rooms found" + error);
+      //   });
+      //   }
+    },
 
     editItem(item) {
       this.editedIndex = this.room.indexOf(item);
@@ -399,7 +449,7 @@ export default {
     },
     deleteItem(id) {
       const index = this.room.indexOf(id);
-      console.log(id)
+      console.log(id);
       axios
         .post("http://localhost:3000/bhm/deleteRoomByID/" + id, {
           token: this.$store.state.token
@@ -482,25 +532,25 @@ export default {
         }
       }
     },
-    createOccupant(){
+    createOccupant() {
       // console.log(this.editedItem)
       axios
-            .post("http://localhost:3000/bhm/createOccupant", {
-              token: this.$store.state.token,
-              _id: this.editedItem.number,
-              room_name: this.editedItem.roomName,
-              room_floor: this.editedItem.roomFloor,
-              occupant_name: this.editedOccupant.occupant_name,
-              occupant_email: this.editedOccupant.occupant_email,
-              occupant_contact: this.editedOccupant.occupant_contact
-            })
-            .then(response => {
-              // this.occupant = populateOccupant();
-              console.log(response);
-            })
-            .catch(error => {
-              console.log(error);
-            });
+        .post("http://localhost:3000/bhm/createOccupant", {
+          token: this.$store.state.token,
+          _id: this.editedItem.number,
+          room_name: this.editedItem.roomName,
+          room_floor: this.editedItem.roomFloor,
+          occupant_name: this.editedOccupant.occupant_name,
+          occupant_email: this.editedOccupant.occupant_email,
+          occupant_contact: this.editedOccupant.occupant_contact
+        })
+        .then(response => {
+          // this.occupant = populateOccupant();
+          console.log(response);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   }
 };
