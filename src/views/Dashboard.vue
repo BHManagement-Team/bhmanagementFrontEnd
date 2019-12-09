@@ -87,16 +87,16 @@
             </template>
             <template v-slot:item.status="{ item }">
               <span>{{item.status}}</span>
-              <v-icon small class="mr-2" @click="editItem(item)">mdi-account</v-icon>
+              <v-icon small class="mr-2" @click="editItem(item)" v-if="isShown(item)" color="red lighten-2">mdi-account</v-icon>
             </template>
             <v-icon small class="mr-2" @click="editItem(item)">mdi-account</v-icon>
             <template v-slot:item.addOccupant="{ item }">
-              <v-btn :disabled="isDisable(item)" @click="editPayment(item)">Add Occupant</v-btn>
+              <v-btn :disabled="isDisable(item)" @click="editPayment(item)" color="primary" light class="ma-2">Add Occupant</v-btn>
             </template>
             <template v-slot:item.action="{ item }">
-              <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+              <v-icon small class="mr-2" @click="editItem(item)" color="blue lighten-2">mdi-pencil</v-icon>
 
-              <v-icon small @click="openDialog(item.number)">mdi-delete</v-icon>
+              <v-icon small @click="openDialog(item.number)" color="blue lighten-2" :disabled="isdeletable(item)">mdi-delete</v-icon>
             </template>
           </v-data-table>
         </v-col>
@@ -177,6 +177,7 @@
                 <v-text-field
                   v-model="editedOccupant.occupant_contact"
                   label="Contact"
+                   
                   :rules="nameRules"
                 ></v-text-field>
               </v-container>
@@ -251,9 +252,9 @@
 <script>
 import axios from "axios";
 
-
 export default {
   data: () => ({
+  
     datax: [],
     disable: false,
     search: "",
@@ -267,6 +268,7 @@ export default {
     dialog: false,
     addOccupant: false,
     occupantNum: [],
+    showIcon:true,
     //for the status
     tempNumber: "ss",
     nameRules: [v => !!v || "Name is required"],
@@ -308,6 +310,7 @@ export default {
       occupant_email: "",
       occupant_contact: ""
     },
+    
     //temporary value for editing
     ItemInRow: {
       number: "",
@@ -339,12 +342,25 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.addOccupant = true;
     },
+    isdeletable(item){
+      if (item.status == "Empty") {
+        return false;
+      }
+    },
+
     isDisable(item) {
-      if (item.status == "ss") {
+      if (item.status == "Full" || item.status>item.roomCapacity) {
         return true;
       }
       // check option and index
       // return true - disable, false - active
+    },
+    isShown(item) {
+      console.log(item)
+      if (item.status != "Full" && item.status != "Empty"  )  {
+        return true;
+      }
+      
     },
 
     populateRoom() {
@@ -374,10 +390,13 @@ export default {
                 token: tokenVar,
                 room_ID:item._id
               })
-              if(response.data.data==null ){
+              if(response.data.data==null || response.data.data==0){
               OccupantCount.push("Empty")
+              }else if(item.room_capacity==response.data.data) {
+               OccupantCount.push("Full") 
               }else{
-               OccupantCount.push(response.data.data) 
+                OccupantCount.push(response.data.data)
+               
               }
             
       }
@@ -393,7 +412,10 @@ export default {
               this.occupantNum=response;
               var counter = 0;
               for (counter; counter < this.datax.length; counter++) {
-                 console.log(this.occupantNum[counter]) 
+                 console.log(this.occupantNum[counter])
+                 if(this.occupantNum[counter] !="Empty" || this.occupantNum[counter] !="Full"){
+                this.showIcon=true
+              }
                 this.room.push({
                   number: this.datax[counter]._id,
                   roomFloor: this.datax[counter].room_floor,
@@ -498,9 +520,25 @@ export default {
               console.log(error);
             });
         } else if (this.$refs.form.validate()) {
-          alert("I'm saving it now");
           this.snackbar = true;
-          axios
+          if(isNaN(this.editedItem.roomFloor)){
+            alert("room floor should be a number ");
+          }
+          else if(isNaN(this.editedItem.roomCapacity)){
+             console.log(this.editedItem.roomCapacity)
+             alert("room capacity should be a number ");
+          }else if(isNaN(this.editedItem.rentPrice)){
+             alert("room price should be a number ");
+          }
+          else if(this.editedItem.roomFloor<0){
+             alert("room floor should not  be less than 0 ");
+          }
+          else if(this.editedItem.roomCapacity<0){
+             alert("room floor should not  be less than 0  ");
+          }else if(this.editedItem.rentPrice<0){
+             alert("room floor should not  be less than 0  ");
+          }else{
+             axios
             .post("http://localhost:3000/bhm/createRoom", {
               room_name: this.editedItem.roomName,
               room_floor: this.editedItem.roomFloor,
@@ -516,6 +554,8 @@ export default {
             .catch(error => {
               console.log(error);
             });
+          }
+         
         }
       }
     },

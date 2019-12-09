@@ -113,11 +113,12 @@ export default {
     var id = sessionStorage.getItem("id");
 
     axios
-      .post("http://localhost:3000/bhm/retrieve/", {
+      .post("http://localhost:3000/bhm/retrieveOne/", {
         id: id,
         token: this.$store.state.token
       })
       .then(response => {
+        console.log("shitty")
         console.log(response);
         this.username = response.data.data.username;
       });
