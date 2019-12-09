@@ -251,6 +251,7 @@
 <script>
 import axios from "axios";
 
+
 export default {
   data: () => ({
     datax: [],
@@ -367,8 +368,9 @@ export default {
       async function getOccupant(tokenVar,roomData) {
         // var counter = 0;
          var OccupantCount =[];
+         console.log(roomData)
           for(const item of roomData){
-         let response = await axios.post("http://localhost:3000/bhm/retrieveRoomOcc", {
+         let response = await axios.post("http://localhost:3000/bhm/retrieveRoomOccupants", {
                 token: tokenVar,
                 room_ID:item._id
               })
@@ -402,62 +404,15 @@ export default {
                 });
               
               }
-            });
+            }).catch(err=>{
+          console.log(err)
+        });      
           }
-
-          // getOccupant()
-          //   .then()
-          //   .catch()
         )
-        .catch();
-      // axios
-      //   .post("http://localhost:3000/bhm/retrieveAllRooms", {
-      //     token: this.$store.state.token
-      //   })
-      //   .then(response => {
-      //     this.datax = response.data.data;
-
-      //   })
-      //   .catch(error => {
-      //     console.log("when no rooms found" + error);
-      //   });
-
-      //   console.log(this.datax)
-
-      //   axios
-      //   .post("http://localhost:3000/bhm/retrieveRoomOcc", {
-      //     token: this.$store.state.token,
-      //     room_ID:"5dedaf593bed808b60ecc1c2"
-      //   })
-      //   .then(response => {
-      //     console.log(response)
-
-      //     var counter = 0;
-      //     for (counter; counter < this.datax.length; counter++) {
-      //      this.occupantNum.push(counter)
-      //     }
-      //     var counter = 0;
-      //     for (counter; counter < this.datax.length; counter++) {
-      //       this.tempNumber=this.occupantNum[counter]
-      //       if(this.occupantNum[counter]==0 ){
-      //         this.tempNumber="empty"
-      //       }else {
-
-      //       }
-      //       this.room.push({
-      //         number: this.datax[counter]._id,
-      //         roomFloor: this.datax[counter].room_floor,
-      //         roomName: this.datax[counter].room_name,
-      //         status: this.tempNumber,
-      //         roomCapacity: this.datax[counter].room_capacity,
-      //         rentPrice: this.datax[counter].room_price
-      //       });
-      //     }
-      //   })
-      //   .catch(error => {
-      //     console.log("when no rooms found" + error);
-      //   });
-      //   }
+        .catch(err=>{
+          console.log(err)
+        });
+      
     },
 
     editItem(item) {
@@ -565,11 +520,11 @@ export default {
       }
     },
     createOccupant() {
-      // console.log(this.editedItem)
+      console.log(this.editedItem)
       axios
         .post("http://localhost:3000/bhm/createOccupant", {
           token: this.$store.state.token,
-          _id: this.editedItem.number,
+          room_ID: this.editedItem.number,
           room_name: this.editedItem.roomName,
           room_floor: this.editedItem.roomFloor,
           occupant_name: this.editedOccupant.occupant_name,
