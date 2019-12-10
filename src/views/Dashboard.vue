@@ -604,10 +604,9 @@ export default {
           occupant_contact: this.editedOccupant.occupant_contact
         })
         .then(response => {
-
-        
           console.log("item in row ",this.ItemInRow)
-          
+          this.addOccupant = false;
+          this.successAddOccupant = true
           console.log(this.room.indexOf(this.editedItem))
           if(this.editedItem.status=="Empty"){
             this.editedItem.status=1
