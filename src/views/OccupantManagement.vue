@@ -188,7 +188,7 @@
                 <img src="~@/assets/suc.gif" id="successImg" />
               </center>
               <br />
-              <h2 class="headline">Room has been added successfully!!</h2>
+              <h2 class="headline">Occupant successfully added!!</h2>
               <br />
               <v-spacer></v-spacer>
               <br />
@@ -206,7 +206,7 @@
                 <img src="~@/assets/suc.gif" id="successImg" />
               </center>
               <br />
-              <h2 class="headline">Room has been updated successfully!!</h2>
+              <h2 class="headline">Occupant successfully updated!!</h2>
               <br />
               <v-spacer></v-spacer>
               <br />
@@ -224,7 +224,7 @@
                 <img src="~@/assets/suc.gif" id="successImg" />
               </center>
               <br />
-              <h2 class="headline">Room has been deleted successfully!!</h2>
+              <h2 class="headline">Ocuupant successfully deleted!!</h2>
               <br />
               <v-spacer></v-spacer>
               <br />
@@ -416,6 +416,7 @@ export default {
       this.editedIndex = this.occupant.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+
     },
     showSuccess() {
       this.success = true;
@@ -428,6 +429,7 @@ export default {
     },
     deleteItem(id) {
       const index = this.occupant.indexOf(id);
+      alert(id)
       axios
         .post("http://localhost:3000/bhm/deleteOccupantByID/" + id, {
           token: localStorage.token
@@ -526,9 +528,10 @@ export default {
     //for payment details
     paymentDetail(item) {
       this.editedItem = Object.assign({}, item);
+      alert(item)
       axios
         .post(
-          "http://localhost:3000/bhm/retrievePaymentByOccID/" +
+          "http://localhost:3000/bhm/retrievePaymentByID" ,
             this.editedItem._id,
           { token: this.$store.state.token }
         )
@@ -547,8 +550,9 @@ export default {
         console.log(this.temporary);
         axios
           .post(
-            "http://localhost:3000/bhm/updateOnePayment/" + this.temporary._id,
+            "http://localhost:3000/bhm/updateOnePayment" , 
             {
+              occupant_ID:this.temporary._id,
               token: this.$store.state.token,
               amount: this.editedPayment.paymentAmount
             }
@@ -571,7 +575,7 @@ export default {
           });
       } else {
         axios
-          .post("http://localhost:3000/bhm/payment/" + this.editedItem._id, {
+          .post("http://localhost:3000/bhm/payment" , this.editedItem._id, {
             token: this.$store.state.token,
             amount: this.editedPayment.paymentAmount
           })
