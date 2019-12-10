@@ -57,7 +57,7 @@
                           v-model="editedItem.occupant_contact"
                           label="Contact"
                           :rules="nameRules"
-                          v-mask="mask"
+                    
                         ></v-text-field>
                       </v-container>
                     </v-card-text>
@@ -282,7 +282,7 @@ v-btn {
 </style>
 <script>
 import axios from "axios";
-import mask from 'vue-the-mask'
+
 function populateOccupant() {
   var room = [];
   axios
@@ -311,7 +311,7 @@ function populateOccupant() {
 }
 export default {
   data: () => ({
-    mask:"####-###-####",
+
     search: "",
     deleteconfirm: false,
     updated: false,
@@ -384,9 +384,6 @@ export default {
       occupant_contact: ""
     }
   }),
-  directives:{
-    mask
-  },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "ADD OCCUPANT" : "OCCUPANT DETAILS";

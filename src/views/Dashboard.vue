@@ -352,7 +352,8 @@ export default {
       roomFloor: "",
       roomName: "",
       roomCapacity: "",
-      rentPrice: ""
+      rentPrice: "",
+      status:""
     }
   }),
   computed: {
@@ -376,12 +377,12 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.ItemInRow=Object.assign({}, item);
       this.editedIndex = this.room.indexOf(item);
-      console.log(this.editedIndex)
+      console.log("temporary ",this.ItemInRow)
       this.addOccupant = true;
     },
     isdeletable(item) {
-      if (item.status == "Empty") {
-        return false;
+      if (item.status != "Empty") {
+        return true;
       }
     },
     // tempStore(){
@@ -470,8 +471,9 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.room.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      console.log(this.editedItem);
+      this.editedItem= Object.assign({}, item);
+      this.ItemInRow = Object.assign({}, item);
+      console.log("god",this.ItemInRow);
       this.dialog = true;
     },
     //dialogs after transaction
@@ -534,11 +536,13 @@ export default {
         }
       } else {
         if (this.editedIndex > -1) {
+          console.log("ayw saba",this.ItemInRow)
+          if(this.ItemInRow.roomCapacity<this.editedItem.roomCapacity){
           axios
             .post(
-              "http://localhost:3000/bhm/updateRoom/" + this.editedItem.number,
+              "http://localhost:3000/bhm/updateRoom",
               {
-                _id: this.editedItem.number,
+                room_ID: this.editedItem.number,
                 room_name: this.editedItem.roomName,
                 room_floor: this.editedItem.roomFloor,
                 room_capacity: this.editedItem.roomCapacity,
@@ -547,6 +551,9 @@ export default {
               }
             )
             .then(() => {
+              if(this.editedItem.status="Full"){
+                this.editedItem.status=this.ItemInRow.roomCapacity
+              }
               Object.assign(this.room[this.editedIndex], this.editedItem);
               this.showupdated();
               this.close();
@@ -554,7 +561,11 @@ export default {
             .catch(error => {
               console.log(error);
             });
+          }else{
+            alert("room can be over crowded")
+          }
         } else if (this.$refs.form.validate()) {
+          console.log("hoi")
           this.snackbar = true;
           if (isNaN(this.editedItem.roomFloor)) {
             alert("room floor should be a number ");
@@ -579,6 +590,7 @@ export default {
                 token: this.$store.state.token
               })
               .then(
+                this.editedItem.status="Empty",
                 this.room.push(this.editedItem),
                 this.showSuccess(),
                 this.close()
@@ -603,9 +615,7 @@ export default {
           occupant_email: this.editedOccupant.occupant_email,
           occupant_contact: this.editedOccupant.occupant_contact
         })
-        .then(response => {
-
-        
+        .then(response => {     
           console.log("item in row ",this.ItemInRow)
           
           console.log(this.room.indexOf(this.editedItem))
@@ -613,7 +623,11 @@ export default {
             this.editedItem.status=1
           }else{
           this.editedItem.status+=1
+          if(this.editedItem.status+=1 == this.editedItem.roomCapacity){
+            this.editedItem.status="Full"
           }
+          }
+          
          Object.assign(this.room[this.editedIndex], this.editedItem);
           
           console.log(response);
