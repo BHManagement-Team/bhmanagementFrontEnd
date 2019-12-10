@@ -87,16 +87,33 @@
             </template>
             <template v-slot:item.status="{ item }">
               <span>{{item.status}}</span>
-              <v-icon small class="mr-2" @click="editItem(item)" v-if="isShown(item)" color="red lighten-2">mdi-account</v-icon>
+              <v-icon
+                small
+                class="mr-2"
+                @click="editItem(item)"
+                v-if="isShown(item)"
+                color="red lighten-2"
+              >mdi-account</v-icon>
             </template>
             <v-icon small class="mr-2" @click="editItem(item)">mdi-account</v-icon>
             <template v-slot:item.addOccupant="{ item }">
-              <v-btn :disabled="isDisable(item)" @click="editPayment(item)" color="primary" light class="ma-2">Add Occupant</v-btn>
+              <v-btn
+                :disabled="isDisable(item)"
+                @click="addOccupantModal(item)"
+                color="primary"
+                light
+                class="ma-2"
+              >Add Occupant</v-btn>
             </template>
             <template v-slot:item.action="{ item }">
               <v-icon small class="mr-2" @click="editItem(item)" color="blue lighten-2">mdi-pencil</v-icon>
 
-              <v-icon small @click="openDialog(item.number)" color="blue lighten-2" :disabled="isdeletable(item)">mdi-delete</v-icon>
+              <v-icon
+                small
+                @click="openDialog(item.number)"
+                color="blue lighten-2"
+                :disabled="isdeletable(item)"
+              >mdi-delete</v-icon>
             </template>
           </v-data-table>
         </v-col>
@@ -119,7 +136,25 @@
         </v-card>
       </v-dialog>
       <!-- end -->
-      <v-dialog v-model="success" max-width="500px" id="confirm">
+      <v-dialog v-model="successAddOccupant" max-width="500px" id="confirm">
+        <v-card>
+          <v-card-title>
+            <center>
+              <img src="~@/assets/suc.gif" id="successImg">
+            </center>
+            <br>
+            <h2 class="headline">Occupant successfully added!!</h2>
+            <br>
+            <v-spacer></v-spacer>
+            <br>
+            <br>
+            <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn>
+            <br>
+            <v-spacer></v-spacer>
+          </v-card-title>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="successAddOccupant" max-width="500px" id="confirm">
         <v-card>
           <v-card-title>
             <center>
@@ -131,7 +166,7 @@
             <v-spacer></v-spacer>
             <br>
             <br>
-            <v-btn class="btnClose" outlined color="success" @click="closesuccess()">C L O S E</v-btn>
+            <v-btn class="btnClose" outlined color="success" @click="closeSuccess()">C L O S E</v-btn>
             <br>
             <v-spacer></v-spacer>
           </v-card-title>
@@ -177,7 +212,6 @@
                 <v-text-field
                   v-model="editedOccupant.occupant_contact"
                   label="Contact"
-                   
                   :rules="nameRules"
                 ></v-text-field>
               </v-container>
@@ -254,7 +288,7 @@ import axios from "axios";
 
 export default {
   data: () => ({
-  
+    successAddOccupant: false,
     datax: [],
     disable: false,
     search: "",
@@ -268,7 +302,7 @@ export default {
     dialog: false,
     addOccupant: false,
     occupantNum: [],
-    showIcon:true,
+    showIcon: true,
     //for the status
     tempNumber: "ss",
     nameRules: [v => !!v || "Name is required"],
@@ -310,7 +344,7 @@ export default {
       occupant_email: "",
       occupant_contact: ""
     },
-    
+
     //temporary value for editing
     ItemInRow: {
       number: "",
@@ -337,34 +371,32 @@ export default {
     }
   },
   methods: {
-    editPayment(item) {
+    addOccupantModal(item) {
       console.log(item);
       this.editedItem = Object.assign({}, item);
       this.addOccupant = true;
     },
-    isdeletable(item){
+    isdeletable(item) {
       if (item.status == "Empty") {
         return false;
       }
     },
 
     isDisable(item) {
-      if (item.status == "Full" || item.status>item.roomCapacity) {
+      if (item.status == "Full" || item.status > item.roomCapacity) {
         return true;
       }
       // check option and index
       // return true - disable, false - active
     },
     isShown(item) {
-      console.log(item)
-      if (item.status != "Full" && item.status != "Empty"  )  {
+      console.log(item);
+      if (item.status != "Full" && item.status != "Empty") {
         return true;
       }
-      
     },
 
     populateRoom() {
-
       async function getRooms(tokenVar) {
         var respon = axios
           .post("http://localhost:3000/bhm/retrieveAllRooms", {
@@ -381,41 +413,44 @@ export default {
       }
 
       //get occupant
-      async function getOccupant(tokenVar,roomData) {
+      async function getOccupant(tokenVar, roomData) {
         // var counter = 0;
-         var OccupantCount =[];
-         console.log(roomData)
-          for(const item of roomData){
-         let response = await axios.post("http://localhost:3000/bhm/retrieveRoomOccupants", {
-                token: tokenVar,
-                room_ID:item._id
-              })
-              if(response.data.data==null || response.data.data==0){
-              OccupantCount.push("Empty")
-              }else if(item.room_capacity==response.data.data) {
-               OccupantCount.push("Full") 
-              }else{
-                OccupantCount.push(response.data.data)
-               
-              }
-            
-      }
-       return OccupantCount
+        var OccupantCount = [];
+        console.log(roomData);
+        for (const item of roomData) {
+          let response = await axios.post(
+            "http://localhost:3000/bhm/retrieveRoomOccupants",
+            {
+              token: tokenVar,
+              room_ID: item._id
+            }
+          );
+          if (response.data.data == null || response.data.data == 0) {
+            OccupantCount.push("Empty");
+          } else if (item.room_capacity == response.data.data) {
+            OccupantCount.push("Full");
+          } else {
+            OccupantCount.push(response.data.data);
+          }
+        }
+        return OccupantCount;
       }
 
       getRooms(this.$store.state.token)
-        .then(
-          respon => {
-            this.datax = respon.data.data;
-            getOccupant(this.$store.state.token, this.datax).then(response => {
-              
-              this.occupantNum=response;
+        .then(respon => {
+          this.datax = respon.data.data;
+          getOccupant(this.$store.state.token, this.datax)
+            .then(response => {
+              this.occupantNum = response;
               var counter = 0;
               for (counter; counter < this.datax.length; counter++) {
-                 console.log(this.occupantNum[counter])
-                 if(this.occupantNum[counter] !="Empty" || this.occupantNum[counter] !="Full"){
-                this.showIcon=true
-              }
+                console.log(this.occupantNum[counter]);
+                if (
+                  this.occupantNum[counter] != "Empty" ||
+                  this.occupantNum[counter] != "Full"
+                ) {
+                  this.showIcon = true;
+                }
                 this.room.push({
                   number: this.datax[counter]._id,
                   roomFloor: this.datax[counter].room_floor,
@@ -424,17 +459,15 @@ export default {
                   roomCapacity: this.datax[counter].room_capacity,
                   rentPrice: this.datax[counter].room_price
                 });
-              
               }
-            }).catch(err=>{
-          console.log(err)
-        });      
-          }
-        )
-        .catch(err=>{
-          console.log(err)
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        })
+        .catch(err => {
+          console.log(err);
         });
-      
     },
 
     editItem(item) {
@@ -456,6 +489,9 @@ export default {
     showDelete() {
       this.deleteconfirm = true;
     },
+    closeSuccess() {
+      this.successAddOccupant = true;
+    },
     deleteItem(id) {
       const index = this.room.indexOf(id);
       console.log(id);
@@ -474,6 +510,7 @@ export default {
       this.confirm = false;
     },
     closesuccess() {
+      this.successAddOccupant = false;
       this.success = false;
     },
     cloeseupdate() {
@@ -483,6 +520,7 @@ export default {
       this.deleteconfirm = false;
     },
     close() {
+      this.addOccupant = false;
       this.$refs.form.resetValidation();
       this.dialog = false;
       this.confirm = false;
@@ -521,46 +559,42 @@ export default {
             });
         } else if (this.$refs.form.validate()) {
           this.snackbar = true;
-          if(isNaN(this.editedItem.roomFloor)){
+          if (isNaN(this.editedItem.roomFloor)) {
             alert("room floor should be a number ");
+          } else if (isNaN(this.editedItem.roomCapacity)) {
+            console.log(this.editedItem.roomCapacity);
+            alert("room capacity should be a number ");
+          } else if (isNaN(this.editedItem.rentPrice)) {
+            alert("room price should be a number ");
+          } else if (this.editedItem.roomFloor < 0) {
+            alert("room floor should not  be less than 0 ");
+          } else if (this.editedItem.roomCapacity < 0) {
+            alert("room floor should not  be less than 0  ");
+          } else if (this.editedItem.rentPrice < 0) {
+            alert("room floor should not  be less than 0  ");
+          } else {
+            axios
+              .post("http://localhost:3000/bhm/createRoom", {
+                room_name: this.editedItem.roomName,
+                room_floor: this.editedItem.roomFloor,
+                room_capacity: this.editedItem.roomCapacity,
+                room_price: this.editedItem.rentPrice,
+                token: this.$store.state.token
+              })
+              .then(
+                this.room.push(this.editedItem),
+                this.showSuccess(),
+                this.close()
+              )
+              .catch(error => {
+                console.log(error);
+              });
           }
-          else if(isNaN(this.editedItem.roomCapacity)){
-             console.log(this.editedItem.roomCapacity)
-             alert("room capacity should be a number ");
-          }else if(isNaN(this.editedItem.rentPrice)){
-             alert("room price should be a number ");
-          }
-          else if(this.editedItem.roomFloor<0){
-             alert("room floor should not  be less than 0 ");
-          }
-          else if(this.editedItem.roomCapacity<0){
-             alert("room floor should not  be less than 0  ");
-          }else if(this.editedItem.rentPrice<0){
-             alert("room floor should not  be less than 0  ");
-          }else{
-             axios
-            .post("http://localhost:3000/bhm/createRoom", {
-              room_name: this.editedItem.roomName,
-              room_floor: this.editedItem.roomFloor,
-              room_capacity: this.editedItem.roomCapacity,
-              room_price: this.editedItem.rentPrice,
-              token: this.$store.state.token
-            })
-            .then(
-              this.room.push(this.editedItem),
-              this.showSuccess(),
-              this.close()
-            )
-            .catch(error => {
-              console.log(error);
-            });
-          }
-         
         }
       }
     },
     createOccupant() {
-      console.log(this.editedItem)
+      console.log(this.editedItem);
       axios
         .post("http://localhost:3000/bhm/createOccupant", {
           token: this.$store.state.token,
@@ -572,6 +606,8 @@ export default {
           occupant_contact: this.editedOccupant.occupant_contact
         })
         .then(response => {
+          this.addOccupant = false;
+          this.closeSuccess();
           // this.occupant = populateOccupant();
           console.log(response);
         })
