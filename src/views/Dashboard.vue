@@ -303,7 +303,8 @@ export default {
       roomFloor: "",
       roomName: "",
       roomCapacity: "",
-      rentPrice: ""
+      rentPrice: "",
+      status:""
     },
     editedOccupant: {
       occupant_name: "",
@@ -338,8 +339,10 @@ export default {
   },
   methods: {
     editPayment(item) {
-      console.log(item);
       this.editedItem = Object.assign({}, item);
+      this.ItemInRow=Object.assign({}, item);
+      this.editedIndex = this.room.indexOf(item);
+      console.log(this.editedIndex)
       this.addOccupant = true;
     },
     isdeletable(item){
@@ -347,7 +350,9 @@ export default {
         return false;
       }
     },
-
+    // tempStore(){
+    //   this.ItemInRow=editedItem
+    // },
     isDisable(item) {
       if (item.status == "Full" || item.status>item.roomCapacity) {
         return true;
@@ -356,7 +361,6 @@ export default {
       // return true - disable, false - active
     },
     isShown(item) {
-      console.log(item)
       if (item.status != "Full" && item.status != "Empty"  )  {
         return true;
       }
@@ -364,13 +368,12 @@ export default {
     },
 
     populateRoom() {
-
       async function getRooms(tokenVar) {
         var respon = axios
           .post("http://localhost:3000/bhm/retrieveAllRooms", {
             token: tokenVar
           })
-          .then(response => {
+          .then(response => {    
             return response;
           })
           .catch(error => {
@@ -384,7 +387,6 @@ export default {
       async function getOccupant(tokenVar,roomData) {
         // var counter = 0;
          var OccupantCount =[];
-         console.log(roomData)
           for(const item of roomData){
          let response = await axios.post("http://localhost:3000/bhm/retrieveRoomOccupants", {
                 token: tokenVar,
@@ -407,15 +409,13 @@ export default {
         .then(
           respon => {
             this.datax = respon.data.data;
-            getOccupant(this.$store.state.token, this.datax).then(response => {
-              
+           getOccupant(this.$store.state.token, this.datax).then(response => {             
               this.occupantNum=response;
               var counter = 0;
               for (counter; counter < this.datax.length; counter++) {
-                 console.log(this.occupantNum[counter])
                  if(this.occupantNum[counter] !="Empty" || this.occupantNum[counter] !="Full"){
                 this.showIcon=true
-              }
+              }      
                 this.room.push({
                   number: this.datax[counter]._id,
                   roomFloor: this.datax[counter].room_floor,
@@ -458,7 +458,6 @@ export default {
     },
     deleteItem(id) {
       const index = this.room.indexOf(id);
-      console.log(id);
       axios
         .post("http://localhost:3000/bhm/deleteRoomByID/" + id, {
           token: this.$store.state.token
@@ -525,7 +524,6 @@ export default {
             alert("room floor should be a number ");
           }
           else if(isNaN(this.editedItem.roomCapacity)){
-             console.log(this.editedItem.roomCapacity)
              alert("room capacity should be a number ");
           }else if(isNaN(this.editedItem.rentPrice)){
              alert("room price should be a number ");
@@ -547,7 +545,8 @@ export default {
               token: this.$store.state.token
             })
             .then(
-              this.room.push(this.editedItem),
+              this.editedItem.status="Empty",
+              this.room.push(this.editedItem),              
               this.showSuccess(),
               this.close()
             )
@@ -560,7 +559,6 @@ export default {
       }
     },
     createOccupant() {
-      console.log(this.editedItem)
       axios
         .post("http://localhost:3000/bhm/createOccupant", {
           token: this.$store.state.token,
@@ -572,7 +570,18 @@ export default {
           occupant_contact: this.editedOccupant.occupant_contact
         })
         .then(response => {
-          // this.occupant = populateOccupant();
+
+        
+          console.log("item in row ",this.ItemInRow)
+          
+          console.log(this.room.indexOf(this.editedItem))
+          if(this.editedItem.status=="Empty"){
+            this.editedItem.status=1
+          }else{
+          this.editedItem.status+=1
+          }
+         Object.assign(this.room[this.editedIndex], this.editedItem);
+          
           console.log(response);
         })
         .catch(error => {
