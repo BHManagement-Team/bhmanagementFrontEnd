@@ -552,9 +552,9 @@ export default {
         console.log(this.temporary);
         axios
           .post(
-            "http://localhost:3000/bhm/updateOnePayment" , 
+            "http://localhost:3000/bhm/updatePayment" , 
             {
-              occupant_ID:this.temporary._id,
+              id:this.temporary._id,
               token: this.$store.state.token,
               amount: this.editedPayment.paymentAmount
             }
@@ -578,9 +578,10 @@ export default {
       } else {
         // alert(this.editedPayment._id)
         axios
-          .post("http://localhost:3000/bhm/payment/" + this.editedItem._id, {
+          .post("http://localhost:3000/bhm/payment", {
             token: this.$store.state.token,
-            amount: this.editedPayment.paymentAmount
+            amount: this.editedPayment.paymentAmount,
+            id:this.editedItem._id
           })
           .then(response => {
             this.paymentHistory.unshift(response.data.data);

@@ -56,6 +56,7 @@
                                 label="Room Capacity"
                                 :rules="capacityRules"
                                 type="number"
+                                min=0
                               ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
@@ -64,6 +65,7 @@
                                 label="Rent Price"
                                 :rules="priceRules"
                                 type="number"
+                                min=0
                               ></v-text-field>
                             </v-col>
                           </v-row>
