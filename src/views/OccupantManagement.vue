@@ -37,16 +37,19 @@
                           v-model="editedItem.room_floor"
                           label="Room Floor"
                           :rules="nameRules"
+                          readonly=""
                         ></v-text-field>
                         <v-text-field
                           v-model="editedItem.room_name"
                           label="Room Name"
+                          readonly=""
                           :rules="nameRules"
                         ></v-text-field>
                         <v-text-field
                           v-model="editedItem.occupant_name"
                           label="Name"
                           :rules="nameRules"
+                          autofocus=""
                         ></v-text-field>
                         <v-text-field
                           v-model="editedItem.occupant_email"
@@ -296,8 +299,8 @@ function populateOccupant() {
       for (counter; counter < datax.length; counter++) {
         room.push({
           _id: datax[counter]._id,
-          room_floor: datax[counter].room_floor,
-          room_name: datax[counter].room_name,
+          room_floor: datax[counter].room_ID.room_floor,
+          room_name: datax[counter].room_ID.room_name,
           occupant_name: datax[counter].occupant_name,
           occupant_email: datax[counter].occupant_email,
           occupant_contact: datax[counter].occupant_contact
@@ -338,7 +341,7 @@ export default {
       {
         text: "Payment Date",
         align: "Amount",
-        value: "billing_date"
+        value: "date_pay"
       },
       { text: "Amount", value: "amount", sortable: false },
       { text: "Actions", value: "action", sortable: false }
@@ -524,15 +527,17 @@ export default {
     },
     //for payment details
     paymentDetail(item) {
+      console.log(item);
+      (item)
       this.editedItem = Object.assign({}, item);
-      alert(item)
       axios
         .post(
           "http://localhost:3000/bhm/retrievePaymentByID" ,
-            this.editedItem._id,
-          { token: this.$store.state.token }
-        )
+          {occupant_ID: this.editedItem._id,
+          token: this.$store.state.token}
+          )
         .then(response => {
+          console.log(response)
           this.paymentHistory = response.data.data.reverse();
           this.modalPayment = false;
         })
@@ -571,8 +576,9 @@ export default {
             console.log(error);
           });
       } else {
+        // alert(this.editedPayment._id)
         axios
-          .post("http://localhost:3000/bhm/payment" , this.editedItem._id, {
+          .post("http://localhost:3000/bhm/payment/" + this.editedItem._id, {
             token: this.$store.state.token,
             amount: this.editedPayment.paymentAmount
           })
