@@ -24,7 +24,6 @@
               <v-spacer></v-spacer>
 
               <v-dialog v-model="dialog" max-width="500px">
-                
                 <v-card>
                   <v-form ref="form" v-model="valid" lazy-validation>
                     <v-card-title>
@@ -37,19 +36,25 @@
                           v-model="editedItem.room_floor"
                           label="Room Floor"
                           :rules="nameRules"
-                          readonly=""
+                          readonly
                         ></v-text-field>
                         <v-text-field
                           v-model="editedItem.room_name"
                           label="Room Name"
-                          readonly=""
+                          readonly
                           :rules="nameRules"
                         ></v-text-field>
                         <v-text-field
                           v-model="editedItem.occupant_name"
                           label="Name"
                           :rules="nameRules"
-                          autofocus=""
+                          autofocus
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="editedItem.occupant_gender"
+                          label="Gender"
+                          :rules="nameRules"
+                          autofocus
                         ></v-text-field>
                         <v-text-field
                           v-model="editedItem.occupant_email"
@@ -60,7 +65,6 @@
                           v-model="editedItem.occupant_contact"
                           label="Contact"
                           :rules="nameRules"
-                    
                         ></v-text-field>
                       </v-container>
                     </v-card-text>
@@ -302,6 +306,7 @@ function populateOccupant() {
           room_floor: datax[counter].room_ID.room_floor,
           room_name: datax[counter].room_ID.room_name,
           occupant_name: datax[counter].occupant_name,
+          occupant_gender: datax[counter].occupant_gender,
           occupant_email: datax[counter].occupant_email,
           occupant_contact: datax[counter].occupant_contact
         });
@@ -314,7 +319,6 @@ function populateOccupant() {
 }
 export default {
   data: () => ({
-
     search: "",
     deleteconfirm: false,
     updated: false,
@@ -383,6 +387,7 @@ export default {
       room_floor: "",
       room_name: "",
       occupant_name: "",
+      occupant_gender:"",
       occupant_email: "",
       occupant_contact: ""
     }
@@ -416,7 +421,6 @@ export default {
       this.editedIndex = this.occupant.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-
     },
     showSuccess() {
       this.success = true;
@@ -429,7 +433,7 @@ export default {
     },
     deleteItem(id) {
       const index = this.occupant.indexOf(id);
-      alert(id)
+      alert(id);
       axios
         .post("http://localhost:3000/bhm/deleteOccupantByID/" + id, {
           token: localStorage.token
@@ -460,8 +464,8 @@ export default {
     closeModal() {
       paymentEdit = false;
     },
-    closedelete(){
-      this.deleteconfirm= false
+    closedelete() {
+      this.deleteconfirm = false;
     },
     close() {
       this.updated = false;
@@ -486,6 +490,7 @@ export default {
                 room_name: this.editedItem.room_name,
                 room_floor: this.editedItem.room_floor,
                 occupant_name: this.editedItem.occupant_name,
+                occupant_gender: this.editedItem.occupant_gender,
                 occupant_email: this.editedItem.occupant_email,
                 occupant_contact: this.editedItem.occupant_contact,
                 token: localStorage.token
@@ -501,7 +506,7 @@ export default {
         } else if (this.$refs.form.validate()) {
           this.snackbar = true;
           this.room.push(this.editedItem);
-          
+
           axios
             .post("http://localhost:3000/bhm/createOccupant", {
               token: localStorage.token,
@@ -509,6 +514,7 @@ export default {
               room_name: this.editedItem.room_name,
               room_floor: this.editedItem.room_floor,
               occupant_name: this.editedItem.occupant_name,
+                occupant_gender: this.editedItem.occupant_gender,
               occupant_email: this.editedItem.occupant_email,
               occupant_contact: this.editedItem.occupant_contact
             })
@@ -528,16 +534,15 @@ export default {
     //for payment details
     paymentDetail(item) {
       console.log(item);
-      (item)
+      item;
       this.editedItem = Object.assign({}, item);
       axios
-        .post(
-          "http://localhost:3000/bhm/retrievePaymentByID" ,
-          {occupant_ID: this.editedItem._id,
-          token: this.$store.state.token}
-          )
+        .post("http://localhost:3000/bhm/retrievePaymentByID", {
+          occupant_ID: this.editedItem._id,
+          token: this.$store.state.token
+        })
         .then(response => {
-          console.log(response)
+          console.log(response);
           this.paymentHistory = response.data.data.reverse();
           this.modalPayment = false;
         })
@@ -551,14 +556,11 @@ export default {
       if (this.editedIndex > -1) {
         console.log(this.temporary);
         axios
-          .post(
-            "http://localhost:3000/bhm/updatePayment" , 
-            {
-              id:this.temporary._id,
-              token: this.$store.state.token,
-              amount: this.editedPayment.paymentAmount
-            }
-          )
+          .post("http://localhost:3000/bhm/updatePayment", {
+            id: this.temporary._id,
+            token: this.$store.state.token,
+            amount: this.editedPayment.paymentAmount
+          })
           .then(response => {
             console.log(response);
             this.temporary1 = this.temporary;
@@ -581,7 +583,7 @@ export default {
           .post("http://localhost:3000/bhm/payment", {
             token: this.$store.state.token,
             amount: this.editedPayment.paymentAmount,
-            id:this.editedItem._id
+            id: this.editedItem._id
           })
           .then(response => {
             this.paymentHistory.unshift(response.data.data);

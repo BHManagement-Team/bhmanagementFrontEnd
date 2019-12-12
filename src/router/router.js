@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Login from '../views/Login.vue'
 import Setting from '../views/Setting.vue'
 import Occupant from '../views/OccupantManagement.vue'
+import Analytics from '../views/Analytics.vue'
 import store from '../store/index'
 Vue.use(VueRouter)
 const routes = [
@@ -34,6 +35,15 @@ const routes = [
     path: '/occupantmanagement',
     name: 'Occupant',
     component: Occupant,
+    meta: { 
+      requiresAuth: true
+    },
+   
+  },
+  {
+    path: '/analytics',
+    name: 'Analytics',
+    component: Analytics,
     meta: { 
       requiresAuth: true
     },

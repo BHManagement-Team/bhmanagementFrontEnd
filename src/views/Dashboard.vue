@@ -207,6 +207,11 @@
                   :rules="nameRules"
                 ></v-text-field>
                 <v-text-field
+                  v-model="editedOccupant.occupant_gender"
+                  label="Gender"
+                  :rules="nameRules"
+                ></v-text-field>
+                <v-text-field
                   v-model="editedOccupant.occupant_email"
                   label="Email"
                   :rules="emailRules"
@@ -344,6 +349,7 @@ export default {
     },
     editedOccupant: {
       occupant_name: "",
+      occupant_gender:"",
       occupant_email: "",
       occupant_contact: ""
     },
@@ -614,6 +620,7 @@ export default {
           room_name: this.editedItem.roomName,
           room_floor: this.editedItem.roomFloor,
           occupant_name: this.editedOccupant.occupant_name,
+          occupant_gender:this.editedOccupant.occupant_gender.toLowerCase(),
           occupant_email: this.editedOccupant.occupant_email,
           occupant_contact: this.editedOccupant.occupant_contact
         })
